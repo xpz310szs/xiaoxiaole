@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="google" content="notranslate" />
   <title>星钻消消 · Match Jewel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,14 +15,12 @@
     <div class="orb orb-a"></div>
     <div class="orb orb-b"></div>
     <div class="orb orb-c"></div>
-    <div class="grid-glow"></div>
   </div>
 
   <main class="stage">
     <header class="brand">
-      <p class="brand-mark">Match Jewel</p>
       <h1 class="brand-title">星钻消消</h1>
-      <p class="brand-tagline">滑动相邻宝石，连成三颗以上即可消除</p>
+      <p class="brand-tagline">滑动相邻宝石 · 三连消除</p>
     </header>
 
     <section class="hud" aria-label="对局状态">
@@ -40,7 +39,9 @@
     </section>
 
     <div class="board-wrap">
+      <div id="fx-layer" class="fx-layer" aria-hidden="true"></div>
       <div id="board" class="board" role="grid" aria-label="8×8 宝石棋盘"></div>
+      <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
       <div id="overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="overlay-title">
         <div class="overlay-card">
           <p class="overlay-kicker" id="overlay-kicker">本局结束</p>
@@ -56,7 +57,10 @@
         <button type="button" class="mode-btn active" data-mode="moves">限步 30</button>
         <button type="button" class="mode-btn" data-mode="timed">限时 60 秒</button>
       </div>
-      <button type="button" class="btn ghost" id="restart">重新开始</button>
+      <div class="action-row">
+        <button type="button" class="btn ghost" id="hint">提示</button>
+        <button type="button" class="btn ghost" id="restart">重开</button>
+      </div>
     </section>
   </main>
 
