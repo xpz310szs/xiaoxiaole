@@ -1,28 +1,21 @@
 (() => {
   const SIZE = 8;
   const TYPES = ["ruby", "amber", "jade", "azure", "violet"];
-  const MOVE_LIMIT = 30;
-  const TIME_LIMIT = 60;
-  const SWAP_MS = 180;
-  const POP_MS = 220;
-  const FALL_MS = 260;
-  const HINT_IDLE_MS = 4500;
+  const SWAP_MS = 160;
+  const POP_MS = 200;
+  const FALL_MS = 240;
+  const HINT_IDLE_MS = 5000;
+  const BEST_KEY = "match-jewel-best";
 
   const boardEl = document.getElementById("board");
   const fxLayer = document.getElementById("fx-layer");
   const scoreEl = document.getElementById("score");
-  const limitLabelEl = document.getElementById("limit-label");
-  const limitValueEl = document.getElementById("limit-value");
+  const bestEl = document.getElementById("best");
   const comboEl = document.getElementById("combo");
-  const overlayEl = document.getElementById("overlay");
-  const overlayTitleEl = document.getElementById("overlay-title");
-  const overlayKickerEl = document.getElementById("overlay-kicker");
-  const finalScoreEl = document.getElementById("final-score");
-  const playAgainBtn = document.getElementById("play-again");
   const restartBtn = document.getElementById("restart");
   const hintBtn = document.getElementById("hint");
+  const shuffleBtn = document.getElementById("shuffle");
   const toastEl = document.getElementById("toast");
-  const modeBtns = [...document.querySelectorAll(".mode-btn")];
 
   /** @type {{type:string,special:null|'bomb'}[][]} */
   let grid = [];
@@ -31,12 +24,8 @@
   let selected = null;
   let busy = false;
   let score = 0;
+  let best = Number(localStorage.getItem(BEST_KEY) || 0) || 0;
   let combo = 1;
-  let mode = "moves";
-  let movesLeft = MOVE_LIMIT;
-  let timeLeft = TIME_LIMIT;
-  let timerId = null;
-  let gameOver = false;
   let pointerStart = null;
   let hintTimer = null;
   let toastTimer = null;
@@ -118,9 +107,9 @@
 
   function resetHintTimer() {
     clearTimeout(hintTimer);
-    if (gameOver || busy) return;
+    if (busy) return;
     hintTimer = setTimeout(() => {
-      if (!busy && !gameOver) showHint(false);
+      if (!busy) showHint(false);
     }, HINT_IDLE_MS);
   }
 
@@ -178,15 +167,16 @@
 
   function updateHud() {
     scoreEl.textContent = String(score);
+    bestEl.textContent = String(best);
     comboEl.textContent = `×${combo}`;
-    if (mode === "moves") {
-      limitLabelEl.textContent = "步数";
-      limitValueEl.textContent = String(movesLeft);
-      limitValueEl.classList.toggle("warn", movesLeft <= 5);
-    } else {
-      limitLabelEl.textContent = "时间";
-      limitValueEl.textContent = `${timeLeft}s`;
-      limitValueEl.classList.toggle("warn", timeLeft <= 10);
+    if (score > best) {
+      best = score;
+      bestEl.textContent = String(best);
+      try {
+        localStorage.setItem(BEST_KEY, String(best));
+      } catch (_) {
+        /* ignore */
+      }
     }
   }
 
@@ -196,19 +186,47 @@
     el.classList.add("pulse");
   }
 
+  function cellCenter(r, c) {
+    const boardRect = boardEl.getBoundingClientRect();
+    const cellRect = cells[r][c].getBoundingClientRect();
+    return {
+      x: cellRect.left - boardRect.left + cellRect.width / 2,
+      y: cellRect.top - boardRect.top + cellRect.height / 2,
+    };
+  }
+
   function floatScoreAt(keys, points, isCombo) {
     if (!keys.length) return;
     const mid = parseKey(keys[(keys.length / 2) | 0]);
-    const cell = cells[mid.r][mid.c];
-    const boardRect = boardEl.getBoundingClientRect();
-    const cellRect = cell.getBoundingClientRect();
+    const pos = cellCenter(mid.r, mid.c);
     const el = document.createElement("div");
     el.className = `float-score${isCombo ? " combo" : ""}`;
     el.textContent = isCombo ? `连击 +${points}` : `+${points}`;
-    el.style.left = `${cellRect.left - boardRect.left + cellRect.width / 2}px`;
-    el.style.top = `${cellRect.top - boardRect.top + cellRect.height / 2}px`;
+    el.style.left = `${pos.x}px`;
+    el.style.top = `${pos.y}px`;
     fxLayer.appendChild(el);
     setTimeout(() => el.remove(), 720);
+  }
+
+  function burstAt(keys) {
+    const colors = ["#ff5a4e", "#ffb400", "#3fd46a", "#2f9dff", "#ff7a2f", "#fff"];
+    for (const key of keys.slice(0, 8)) {
+      const { r, c } = parseKey(key);
+      const pos = cellCenter(r, c);
+      for (let i = 0; i < 5; i++) {
+        const p = document.createElement("span");
+        p.className = "burst";
+        const ang = (Math.PI * 2 * i) / 5 + Math.random() * 0.4;
+        const dist = 18 + Math.random() * 22;
+        p.style.left = `${pos.x}px`;
+        p.style.top = `${pos.y}px`;
+        p.style.setProperty("--bx", `${Math.cos(ang) * dist}px`);
+        p.style.setProperty("--by", `${Math.sin(ang) * dist}px`);
+        p.style.background = colors[(Math.random() * colors.length) | 0];
+        fxLayer.appendChild(p);
+        setTimeout(() => p.remove(), 480);
+      }
+    }
   }
 
   function findMatchGroups() {
@@ -228,7 +246,7 @@
               matched.add(key);
               keys.push(key);
             }
-            groups.push({ keys, len: run, orient: "h", r, c0: c - run });
+            groups.push({ keys, len: run });
           }
           run = 1;
         }
@@ -248,7 +266,7 @@
               matched.add(key);
               keys.push(key);
             }
-            groups.push({ keys, len: run, orient: "v", c, r0: r - run });
+            groups.push({ keys, len: run });
           }
           run = 1;
         }
@@ -268,9 +286,7 @@
         for (let dc = -1; dc <= 1; dc++) {
           const nr = r + dr;
           const nc = c + dc;
-          if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
-            extra.add(cellKey(nr, nc));
-          }
+          if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) extra.add(cellKey(nr, nc));
         }
       }
     }
@@ -301,7 +317,7 @@
     cells[a.r][a.c].classList.add("shake");
     cells[b.r][b.c].classList.add("shake");
     beep(180, 0.08, 0.03, "triangle");
-    await sleep(320);
+    await sleep(300);
     cells[a.r][a.c].classList.remove("shake");
     cells[b.r][b.c].classList.remove("shake");
   }
@@ -311,8 +327,7 @@
       const focusKey = cellKey(focus.r, focus.c);
       if (group.keys.includes(focusKey)) return focus;
     }
-    const mid = group.keys[(group.keys.length / 2) | 0];
-    return parseKey(mid);
+    return parseKey(group.keys[(group.keys.length / 2) | 0]);
   }
 
   async function clearAndCascade(initialMatched, focus) {
@@ -327,7 +342,8 @@
       for (const group of groups) {
         if (group.len >= 4) {
           const spot = pickBombSpot(group, focus);
-          const color = grid[spot.r][spot.c]?.type || grid[parseKey(group.keys[0]).r][parseKey(group.keys[0]).c]?.type;
+          const first = parseKey(group.keys[0]);
+          const color = grid[spot.r][spot.c]?.type || grid[first.r][first.c]?.type;
           if (color) bombsToSpawn.push({ ...spot, type: color });
         }
       }
@@ -338,6 +354,7 @@
       pulse(scoreEl);
       if (combo > 1) pulse(comboEl);
       floatScoreAt([...matched], points, combo > 1);
+      burstAt([...matched]);
       beep(420 + combo * 60, 0.07, 0.04);
 
       const anims = {};
@@ -381,7 +398,7 @@
       }
 
       renderAll(fallAnims);
-      await sleep(FALL_MS + 40);
+      await sleep(FALL_MS + 30);
 
       combo += 1;
       focus = null;
@@ -464,8 +481,16 @@
     beep(520, 0.08, 0.03);
   }
 
+  function clearDragVisual() {
+    boardEl.querySelectorAll(".gem.dragging").forEach((g) => {
+      g.classList.remove("dragging");
+      g.style.transform = "";
+    });
+  }
+
   async function trySwap(a, b) {
-    if (busy || gameOver) return;
+    if (busy) return;
+    clearDragVisual();
     if (!isAdjacent(a, b)) {
       selected = b;
       clearHints();
@@ -484,7 +509,7 @@
     swapInPlace(a.r, a.c, b.r, b.c);
     renderAll();
 
-    let matched = findMatchGroups().matched;
+    const matched = findMatchGroups().matched;
     if (matched.size === 0) {
       await shakeCells(a, b);
       await animateSwap(a, b);
@@ -495,17 +520,9 @@
       return;
     }
 
-    if (mode === "moves") {
-      movesLeft = Math.max(0, movesLeft - 1);
-      updateHud();
-      pulse(limitValueEl);
-    }
-
     await clearAndCascade(matched, b);
 
-    if (mode === "moves" && movesLeft <= 0) {
-      endGame();
-    } else if (!hasAnyMove()) {
+    if (!hasAnyMove()) {
       reshuffleUntilPlayable();
       renderAll();
     }
@@ -515,7 +532,7 @@
   }
 
   function onCellTap(r, c) {
-    if (busy || gameOver) return;
+    if (busy) return;
     ensureAudio();
     clearHints();
     if (!selected) {
@@ -534,85 +551,39 @@
     trySwap(selected, { r, c });
   }
 
-  function endGame() {
-    gameOver = true;
-    busy = false;
-    stopTimer();
-    clearTimeout(hintTimer);
-    clearHints();
-    finalScoreEl.textContent = String(score);
-    if (mode === "timed" && timeLeft <= 0) {
-      overlayKickerEl.textContent = "时间到";
-      overlayTitleEl.textContent = score >= 1000 ? "星光闪耀！" : score >= 500 ? "不错哦" : "再试一次";
-    } else if (mode === "moves" && movesLeft <= 0) {
-      overlayKickerEl.textContent = "步数用尽";
-      overlayTitleEl.textContent = score >= 1500 ? "完美消除！" : score >= 800 ? "漂亮！" : "本局结束";
-    } else {
-      overlayKickerEl.textContent = "本局结束";
-      overlayTitleEl.textContent = "漂亮！";
-    }
-    overlayEl.classList.remove("hidden");
-    beep(320, 0.12, 0.04, "triangle");
-  }
-
-  function stopTimer() {
-    if (timerId) {
-      clearInterval(timerId);
-      timerId = null;
-    }
-  }
-
-  function startTimer() {
-    stopTimer();
-    if (mode !== "timed") return;
-    timerId = setInterval(() => {
-      if (gameOver) return;
-      timeLeft -= 1;
-      updateHud();
-      if (timeLeft <= 0) {
-        timeLeft = 0;
-        updateHud();
-        endGame();
-      }
-    }, 1000);
-  }
-
   function startGame() {
-    stopTimer();
     clearTimeout(hintTimer);
     clearTimeout(toastTimer);
     toastEl.classList.add("hidden");
     fxLayer.innerHTML = "";
-    gameOver = false;
     busy = false;
     selected = null;
     score = 0;
     combo = 1;
-    movesLeft = MOVE_LIMIT;
-    timeLeft = TIME_LIMIT;
-    overlayEl.classList.add("hidden");
     grid = createFilledGrid();
     if (!hasAnyMove()) reshuffleUntilPlayable();
     buildBoardDom();
     updateHud();
     renderAll();
-    startTimer();
     resetHintTimer();
   }
 
-  modeBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      modeBtns.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      mode = btn.dataset.mode;
-      startGame();
-    });
+  restartBtn.addEventListener("click", () => {
+    startGame();
+    showToast("新的一局");
   });
 
-  restartBtn.addEventListener("click", startGame);
-  playAgainBtn.addEventListener("click", startGame);
+  shuffleBtn.addEventListener("click", () => {
+    if (busy) return;
+    clearHints();
+    selected = null;
+    reshuffleUntilPlayable();
+    renderAll();
+    resetHintTimer();
+  });
+
   hintBtn.addEventListener("click", () => {
-    if (busy || gameOver) return;
+    if (busy) return;
     showHint(true);
     resetHintTimer();
   });
@@ -621,7 +592,7 @@
     "pointerdown",
     (e) => {
       const cell = e.target.closest(".cell");
-      if (!cell || busy || gameOver) return;
+      if (!cell || busy) return;
       pointerStart = {
         r: Number(cell.dataset.r),
         c: Number(cell.dataset.c),
@@ -642,10 +613,18 @@
   boardEl.addEventListener(
     "pointermove",
     (e) => {
-      if (!pointerStart || pointerStart.id !== e.pointerId) return;
+      if (!pointerStart || pointerStart.id !== e.pointerId || busy) return;
       const dx = e.clientX - pointerStart.x;
       const dy = e.clientY - pointerStart.y;
-      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) pointerStart.moved = true;
+      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) pointerStart.moved = true;
+
+      const gem = cells[pointerStart.r][pointerStart.c]?.querySelector(".gem");
+      if (!gem) return;
+      const max = 28;
+      const ox = Math.max(-max, Math.min(max, dx * 0.45));
+      const oy = Math.max(-max, Math.min(max, dy * 0.45));
+      gem.classList.add("dragging");
+      gem.style.transform = `translate(${ox}px, ${oy}px) scale(1.08)`;
     },
     { passive: true }
   );
@@ -656,9 +635,10 @@
     const dy = e.clientY - pointerStart.y;
     const absX = Math.abs(dx);
     const absY = Math.abs(dy);
-    const threshold = 16;
+    const threshold = 14;
     const start = pointerStart;
     pointerStart = null;
+    clearDragVisual();
     try {
       boardEl.releasePointerCapture(e.pointerId);
     } catch (_) {
@@ -683,8 +663,10 @@
 
   boardEl.addEventListener("pointerup", endPointer);
   boardEl.addEventListener("pointercancel", () => {
+    clearDragVisual();
     pointerStart = null;
   });
 
+  updateHud();
   startGame();
 })();
