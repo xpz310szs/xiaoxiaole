@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>星钻消消 · Match Jewel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="atmosphere" aria-hidden="true">
+    <div class="orb orb-a"></div>
+    <div class="orb orb-b"></div>
+    <div class="orb orb-c"></div>
+    <div class="grid-glow"></div>
+  </div>
+
+  <main class="stage">
+    <header class="brand">
+      <p class="brand-mark">Match Jewel</p>
+      <h1 class="brand-title">星钻消消</h1>
+      <p class="brand-tagline">滑动相邻宝石，连成三颗以上即可消除</p>
+    </header>
+
+    <section class="hud" aria-label="对局状态">
+      <div class="stat">
+        <span class="stat-label">得分</span>
+        <span class="stat-value" id="score">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label" id="limit-label">步数</span>
+        <span class="stat-value" id="limit-value">30</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">连击</span>
+        <span class="stat-value" id="combo">×1</span>
+      </div>
+    </section>
+
+    <div class="board-wrap">
+      <div id="board" class="board" role="grid" aria-label="8×8 宝石棋盘"></div>
+      <div id="overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="overlay-title">
+        <div class="overlay-card">
+          <p class="overlay-kicker" id="overlay-kicker">本局结束</p>
+          <h2 id="overlay-title">漂亮！</h2>
+          <p class="overlay-score">得分 <strong id="final-score">0</strong></p>
+          <button type="button" class="btn primary" id="play-again">再来一局</button>
+        </div>
+      </div>
+    </div>
+
+    <section class="controls" aria-label="模式与操作">
+      <div class="mode-toggle" role="group" aria-label="游戏模式">
+        <button type="button" class="mode-btn active" data-mode="moves">限步 30</button>
+        <button type="button" class="mode-btn" data-mode="timed">限时 60 秒</button>
+      </div>
+      <button type="button" class="btn ghost" id="restart">重新开始</button>
+    </section>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
