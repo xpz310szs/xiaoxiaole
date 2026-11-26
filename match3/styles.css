@@ -721,7 +721,7 @@ body {
 .controls {
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 0.55rem;
   align-items: stretch;
 }
@@ -736,16 +736,6 @@ body {
   font-weight: 700;
   color: #fff;
   border: 3px solid #fff;
-}
-
-.btn.hint {
-  background: linear-gradient(180deg, #7ad7ff 0%, #2f9dff 100%);
-  box-shadow: 0 5px 0 #146ec0;
-}
-
-.btn.hint:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 #146ec0;
 }
 
 .btn.shuffle {
