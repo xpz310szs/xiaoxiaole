@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="google" content="notranslate" />
+  <title>星钻跑酷</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="parkour/styles.css" />
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <main class="stage">
+    <header class="top-bar">
+      <a class="back-link" href="./">← 大厅</a>
+      <div class="logo-block">
+        <p class="logo-en">STAR RUN</p>
+        <h1 class="logo">星钻跑酷</h1>
+      </div>
+      <button type="button" class="icon-btn" id="mute" aria-label="声音">♪</button>
+    </header>
+
+    <section class="hud" aria-label="状态">
+      <div class="badge">
+        <span class="badge-label">距离</span>
+        <span class="badge-value" id="dist">0</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">最高</span>
+        <span class="badge-value" id="best">0</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">星星</span>
+        <span class="badge-value" id="stars">0</span>
+      </div>
+    </section>
+
+    <section class="board-wrap">
+      <canvas id="game" width="400" height="240" aria-label="跑酷画面，点击或空格跳跃"></canvas>
+      <div id="overlay" class="overlay">
+        <p class="overlay-title" id="overlay-title">点一下开始跑</p>
+        <p class="overlay-sub" id="overlay-sub">跳跃两次 · 躲开障碍 · 捡星星</p>
+        <button type="button" class="overlay-btn" id="start">开始</button>
+      </div>
+    </section>
+
+    <p class="tip">点屏幕 / 空格 / ↑ 跳跃 · 再点可二段跳</p>
+
+    <button type="button" class="jump-btn" id="jump" aria-label="跳跃">跳！</button>
+  </main>
+
+  <script src="parkour/game.js"></script>
+</body>
+</html>
