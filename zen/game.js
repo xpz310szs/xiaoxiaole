@@ -65,81 +65,111 @@
     noise.stop(t0 + 0.06);
   }
 
-  /** Mechanical toggle: scrape + sharp seat click (on sharper, off deeper). */
+  let masterGain = null;
+
+  function outNode() {
+    const ctx = ensureAudio();
+    if (!ctx) return null;
+    if (!masterGain) {
+      masterGain = ctx.createGain();
+      masterGain.gain.value = 1.35;
+      masterGain.connect(ctx.destination);
+    }
+    return masterGain;
+  }
+
+  function noiseBurst(ctx, seconds, colorFn) {
+    const n = Math.max(1, Math.floor(ctx.sampleRate * seconds));
+    const buf = ctx.createBuffer(1, n, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) data[i] = colorFn(i, n);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    return src;
+  }
+
+  /** Loud wall-switch clack: travel scrape then hard plastic latch. */
   function clickSound(on) {
     const ctx = ensureAudio();
-    if (!ctx) return;
+    const dest = outNode();
+    if (!ctx || !dest) return;
     const t0 = ctx.currentTime;
-    const jitter = Math.random() * 0.012;
+    const seatAt = t0 + (on ? 0.028 : 0.034);
 
-    // Contact scrape (short band-limited noise)
-    const scrapeLen = Math.floor(ctx.sampleRate * 0.018);
-    const scrapeBuf = ctx.createBuffer(1, scrapeLen, ctx.sampleRate);
-    const scrapeData = scrapeBuf.getChannelData(0);
-    for (let i = 0; i < scrapeLen; i++) {
-      const env = Math.pow(1 - i / scrapeLen, 1.8);
-      scrapeData[i] = (Math.random() * 2 - 1) * env;
-    }
-    const scrape = ctx.createBufferSource();
-    scrape.buffer = scrapeBuf;
-    const scrapeFilter = ctx.createBiquadFilter();
-    scrapeFilter.type = "bandpass";
-    scrapeFilter.frequency.value = on ? 2400 : 1600;
-    scrapeFilter.Q.value = 1.2;
+    // 1) Lever travel / friction
+    const scrape = noiseBurst(ctx, 0.04, (i, n) => {
+      const p = i / n;
+      return (Math.random() * 2 - 1) * Math.pow(1 - p, 1.2) * (0.55 + 0.45 * Math.sin(p * 40));
+    });
+    const scrapeBp = ctx.createBiquadFilter();
+    scrapeBp.type = "bandpass";
+    scrapeBp.frequency.value = on ? 1450 : 980;
+    scrapeBp.Q.value = 0.7;
     const scrapeGain = ctx.createGain();
-    scrapeGain.gain.setValueAtTime(0.055, t0);
-    scrapeGain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.02);
-    scrape.connect(scrapeFilter);
-    scrapeFilter.connect(scrapeGain);
-    scrapeGain.connect(ctx.destination);
+    scrapeGain.gain.setValueAtTime(0.0001, t0);
+    scrapeGain.gain.exponentialRampToValueAtTime(0.22, t0 + 0.004);
+    scrapeGain.gain.exponentialRampToValueAtTime(0.0001, seatAt);
+    scrape.connect(scrapeBp);
+    scrapeBp.connect(scrapeGain);
+    scrapeGain.connect(dest);
     scrape.start(t0);
-    scrape.stop(t0 + 0.025);
+    scrape.stop(seatAt + 0.01);
 
-    // Seat / latch click (layered tones + tiny noise tick)
-    const seatAt = t0 + 0.012 + jitter;
-    const tickLen = Math.floor(ctx.sampleRate * 0.01);
-    const tickBuf = ctx.createBuffer(1, tickLen, ctx.sampleRate);
-    const tickData = tickBuf.getChannelData(0);
-    for (let i = 0; i < tickLen; i++) {
-      tickData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / tickLen, 4);
+    // 2) Hard latch impact (the “咔”)
+    const impact = noiseBurst(ctx, 0.035, (i, n) => {
+      const p = i / n;
+      return (Math.random() * 2 - 1) * Math.pow(1 - p, 5.5);
+    });
+    const impactHp = ctx.createBiquadFilter();
+    impactHp.type = "highpass";
+    impactHp.frequency.value = on ? 900 : 450;
+    const impactLp = ctx.createBiquadFilter();
+    impactLp.type = "lowpass";
+    impactLp.frequency.value = on ? 5200 : 3200;
+    const impactGain = ctx.createGain();
+    impactGain.gain.setValueAtTime(0.0001, seatAt);
+    impactGain.gain.exponentialRampToValueAtTime(0.55, seatAt + 0.0015);
+    impactGain.gain.exponentialRampToValueAtTime(0.0001, seatAt + 0.05);
+    impact.connect(impactHp);
+    impactHp.connect(impactLp);
+    impactLp.connect(impactGain);
+    impactGain.connect(dest);
+    impact.start(seatAt);
+    impact.stop(seatAt + 0.06);
+
+    // 3) Low thump through the wall plate
+    const thump = ctx.createOscillator();
+    const thumpGain = ctx.createGain();
+    thump.type = "sine";
+    thump.frequency.setValueAtTime(on ? 160 : 110, seatAt);
+    thump.frequency.exponentialRampToValueAtTime(on ? 70 : 48, seatAt + 0.08);
+    thumpGain.gain.setValueAtTime(0.0001, seatAt);
+    thumpGain.gain.exponentialRampToValueAtTime(0.28, seatAt + 0.002);
+    thumpGain.gain.exponentialRampToValueAtTime(0.0001, seatAt + 0.1);
+    thump.connect(thumpGain);
+    thumpGain.connect(dest);
+    thump.start(seatAt);
+    thump.stop(seatAt + 0.11);
+
+    // 4) Bright plastic ring
+    const ring = ctx.createOscillator();
+    const ringGain = ctx.createGain();
+    ring.type = "triangle";
+    ring.frequency.setValueAtTime(on ? 1650 : 980, seatAt);
+    ring.frequency.exponentialRampToValueAtTime(on ? 720 : 420, seatAt + 0.06);
+    ringGain.gain.setValueAtTime(0.0001, seatAt);
+    ringGain.gain.exponentialRampToValueAtTime(0.16, seatAt + 0.002);
+    ringGain.gain.exponentialRampToValueAtTime(0.0001, seatAt + 0.07);
+    ring.connect(ringGain);
+    ringGain.connect(dest);
+    ring.start(seatAt);
+    ring.stop(seatAt + 0.08);
+
+    try {
+      if (navigator.vibrate) navigator.vibrate(on ? [8, 12, 18] : [14, 10, 22]);
+    } catch (_) {
+      /* ignore */
     }
-    const tick = ctx.createBufferSource();
-    tick.buffer = tickBuf;
-    const tickHp = ctx.createBiquadFilter();
-    tickHp.type = "highpass";
-    tickHp.frequency.value = on ? 1800 : 900;
-    const tickGain = ctx.createGain();
-    tickGain.gain.setValueAtTime(0.07, seatAt);
-    tickGain.gain.exponentialRampToValueAtTime(0.001, seatAt + 0.03);
-    tick.connect(tickHp);
-    tickHp.connect(tickGain);
-    tickGain.connect(ctx.destination);
-    tick.start(seatAt);
-    tick.stop(seatAt + 0.035);
-
-    const body = ctx.createOscillator();
-    const bodyGain = ctx.createGain();
-    body.type = "triangle";
-    body.frequency.setValueAtTime(on ? 380 : 220, seatAt);
-    body.frequency.exponentialRampToValueAtTime(on ? 140 : 90, seatAt + 0.05);
-    bodyGain.gain.setValueAtTime(0.045, seatAt);
-    bodyGain.gain.exponentialRampToValueAtTime(0.001, seatAt + 0.06);
-    body.connect(bodyGain);
-    bodyGain.connect(ctx.destination);
-    body.start(seatAt);
-    body.stop(seatAt + 0.07);
-
-    // Plastic shell resonance (very short)
-    const shell = ctx.createOscillator();
-    const shellGain = ctx.createGain();
-    shell.type = "sine";
-    shell.frequency.value = on ? 980 : 620;
-    shellGain.gain.setValueAtTime(0.02, seatAt);
-    shellGain.gain.exponentialRampToValueAtTime(0.001, seatAt + 0.04);
-    shell.connect(shellGain);
-    shellGain.connect(ctx.destination);
-    shell.start(seatAt);
-    shell.stop(seatAt + 0.045);
   }
 
   function squishSound() {
@@ -221,17 +251,23 @@
     labels.forEach((label, idx) => {
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "switch";
-      btn.innerHTML = `<span class="switch-track"><span class="switch-knob"></span></span><span class="switch-label">${label}</span>`;
+      btn.className = "switch rocker";
+      btn.innerHTML = `
+        <span class="rocker-plate">
+          <span class="rocker-paddle"><span class="rocker-face up">ON</span><span class="rocker-face down">OFF</span></span>
+        </span>
+        <span class="switch-label">${label}</span>`;
       btn.addEventListener("pointerdown", (e) => {
         e.preventDefault();
         ensureAudio();
         const on = !btn.classList.contains("on");
+        btn.classList.add("pressing");
         btn.classList.toggle("on", on);
         clickSound(on);
         bumpStreak();
         pops += 1;
         updateHud();
+        setTimeout(() => btn.classList.remove("pressing"), 120);
       });
       if (idx % 3 === 0) btn.classList.add("on");
       switchWall.appendChild(btn);
