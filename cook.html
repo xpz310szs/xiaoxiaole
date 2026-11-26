@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="google" content="notranslate" />
+  <title>星钻厨房</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="cook/styles.css" />
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <main class="stage">
+    <header class="top-bar">
+      <a class="back-link" href="./">← 大厅</a>
+      <div class="logo-block">
+        <p class="logo-en">STAR KITCHEN</p>
+        <h1 class="logo">星钻厨房</h1>
+      </div>
+      <button type="button" class="icon-btn" id="mute" aria-label="声音">♪</button>
+    </header>
+
+    <section class="hud" aria-label="状态">
+      <div class="badge">
+        <span class="badge-label">得分</span>
+        <span class="badge-value" id="score">0</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">连对</span>
+        <span class="badge-value" id="streak">0</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">最高</span>
+        <span class="badge-value" id="best">0</span>
+      </div>
+    </section>
+
+    <section class="order-card" aria-live="polite">
+      <div class="customer" id="customer" aria-hidden="true">🙂</div>
+      <div class="order-meta">
+        <p class="order-label">客人想要</p>
+        <h2 class="order-name" id="order-name">汉堡套餐</h2>
+        <p class="order-steps" id="order-steps">面包 → 肉饼 → 生菜 → 面包</p>
+      </div>
+      <div class="timer-wrap" aria-label="剩余时间">
+        <div class="timer-bar" id="timer-bar"></div>
+      </div>
+    </section>
+
+    <section class="station">
+      <div class="plate" id="plate" aria-label="当前成品"></div>
+      <p class="hint" id="hint">按顺序点下面的食材</p>
+    </section>
+
+    <div class="tray" id="tray" aria-label="食材"></div>
+
+    <div class="actions">
+      <button type="button" class="action ghost" id="clear">清空</button>
+      <button type="button" class="action solid" id="serve">上菜</button>
+    </div>
+  </main>
+
+  <div id="toast" class="toast hidden" role="status"></div>
+
+  <script src="cook/game.js"></script>
+</body>
+</html>

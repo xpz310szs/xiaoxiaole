@@ -167,6 +167,10 @@ body {
   background: linear-gradient(135deg, #e8f6ff 0%, #b7ddff 100%);
 }
 
+.game-card.cook {
+  background: linear-gradient(135deg, #fff4e4 0%, #ffd7a8 100%);
+}
+
 .preview {
   width: 78px;
   height: 78px;
@@ -326,6 +330,30 @@ body {
   border-radius: 4px;
   background: linear-gradient(180deg, #ff9a4a, #ff5a2a);
   margin-right: 8px;
+}
+
+.preview.cook-mini {
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  position: relative;
+}
+
+.preview.cook-mini .pan {
+  width: 48px;
+  height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, #fff, #e8d8c0 65%, #c8b090);
+  border: 3px solid #fff;
+}
+
+.preview.cook-mini .food {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ff9a4a, #ff5a2a);
+  top: 28px;
 }
 
 .meta h2 {
