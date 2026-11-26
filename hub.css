@@ -149,6 +149,10 @@ body {
   animation-delay: 0.2s;
 }
 
+.game-card:nth-child(5) {
+  animation-delay: 0.26s;
+}
+
 .game-card:active {
   transform: translateY(3px);
   box-shadow: 0 6px 0 rgba(80, 50, 20, 0.18);
@@ -168,6 +172,10 @@ body {
 
 .game-card.calm {
   background: linear-gradient(135deg, #e8f4ff 0%, #d5ebe8 100%);
+}
+
+.game-card.maze {
+  background: linear-gradient(135deg, #e8fff4 0%, #b8f0d4 100%);
 }
 
 .preview {
@@ -278,6 +286,32 @@ body {
 @keyframes orb-breathe {
   0%, 100% { transform: scale(0.86); }
   50% { transform: scale(1.08); }
+}
+
+.preview.maze-mini {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 4px;
+  padding: 10px;
+}
+
+.preview.maze-mini span {
+  border-radius: 4px;
+  background: #2f6b58;
+}
+
+.preview.maze-mini span:nth-child(2),
+.preview.maze-mini span:nth-child(4),
+.preview.maze-mini span:nth-child(5),
+.preview.maze-mini span:nth-child(6),
+.preview.maze-mini span:nth-child(8) {
+  background: #c9f5e4;
+}
+
+.preview.maze-mini .dot {
+  background: radial-gradient(circle at 35% 30%, #fff, #7ec8ff 55%, #2f9dff) !important;
+  border-radius: 50%;
 }
 
 .meta h2 {
