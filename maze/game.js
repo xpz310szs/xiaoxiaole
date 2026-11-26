@@ -125,7 +125,7 @@
 
   function resizeCanvas() {
     const wrap = canvas.parentElement;
-    const side = Math.floor(wrap.clientWidth);
+    const side = Math.max(120, Math.floor(Math.min(wrap.clientWidth, wrap.clientHeight)));
     canvas.width = side * devicePixelRatio;
     canvas.height = side * devicePixelRatio;
     canvas.style.width = side + "px";
@@ -165,7 +165,7 @@
     // exit
     const ex = (exit.x + 0.5) * cellSize;
     const ey = (exit.y + 0.5) * cellSize;
-    const er = cellSize * 0.28;
+    const er = Math.max(5, cellSize * 0.34);
     const grad = ctx.createRadialGradient(ex - er * 0.3, ey - er * 0.3, 1, ex, ey, er);
     grad.addColorStop(0, "#fff6c2");
     grad.addColorStop(0.5, "#ffd23a");
