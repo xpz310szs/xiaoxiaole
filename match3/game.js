@@ -4,7 +4,6 @@
   const SWAP_MS = 160;
   const POP_MS = 200;
   const FALL_MS = 240;
-  const HINT_IDLE_MS = 5000;
   const BEST_KEY = "match-jewel-best";
 
   const boardEl = document.getElementById("board");
@@ -13,7 +12,6 @@
   const bestEl = document.getElementById("best");
   const comboEl = document.getElementById("combo");
   const restartBtn = document.getElementById("restart");
-  const hintBtn = document.getElementById("hint");
   const shuffleBtn = document.getElementById("shuffle");
   const toastEl = document.getElementById("toast");
 
@@ -27,7 +25,6 @@
   let best = Number(localStorage.getItem(BEST_KEY) || 0) || 0;
   let combo = 1;
   let pointerStart = null;
-  let hintTimer = null;
   let toastTimer = null;
   let audioCtx = null;
 
@@ -101,18 +98,6 @@
     toastTimer = setTimeout(() => toastEl.classList.add("hidden"), ms);
   }
 
-  function clearHints() {
-    boardEl.querySelectorAll(".cell.hint").forEach((el) => el.classList.remove("hint"));
-  }
-
-  function resetHintTimer() {
-    clearTimeout(hintTimer);
-    if (busy) return;
-    hintTimer = setTimeout(() => {
-      if (!busy) showHint(false);
-    }, HINT_IDLE_MS);
-  }
-
   function buildBoardDom() {
     boardEl.innerHTML = "";
     cells = Array.from({ length: SIZE }, () => Array(SIZE));
@@ -133,7 +118,7 @@
   function paintGem(r, c, anim) {
     const cell = cells[r][c];
     const t = grid[r][c];
-    cell.classList.remove("selected", "hint", "shake");
+    cell.classList.remove("selected", "shake");
     cell.innerHTML = "";
     if (!t) {
       cell.setAttribute("aria-label", `${r + 1} 行 ${c + 1} 列 空`);
@@ -444,20 +429,6 @@
     return null;
   }
 
-  function showHint(fromButton) {
-    clearHints();
-    const move = findHintMove();
-    if (!move) {
-      if (fromButton) showToast("暂无提示，正在重排");
-      reshuffleUntilPlayable();
-      renderAll();
-      return;
-    }
-    cells[move.a.r][move.a.c].classList.add("hint");
-    cells[move.b.r][move.b.c].classList.add("hint");
-    if (fromButton) beep(660, 0.05, 0.03);
-  }
-
   function reshuffleUntilPlayable() {
     let guard = 0;
     do {
@@ -493,15 +464,11 @@
     clearDragVisual();
     if (!isAdjacent(a, b)) {
       selected = b;
-      clearHints();
       renderAll();
-      resetHintTimer();
       return;
     }
 
     busy = true;
-    clearTimeout(hintTimer);
-    clearHints();
     selected = null;
     ensureAudio();
 
@@ -516,7 +483,6 @@
       swapInPlace(a.r, a.c, b.r, b.c);
       renderAll();
       busy = false;
-      resetHintTimer();
       return;
     }
 
@@ -528,31 +494,26 @@
     }
 
     busy = false;
-    resetHintTimer();
   }
 
   function onCellTap(r, c) {
     if (busy) return;
     ensureAudio();
-    clearHints();
     if (!selected) {
       selected = { r, c };
       renderAll();
       beep(700, 0.03, 0.02);
-      resetHintTimer();
       return;
     }
     if (selected.r === r && selected.c === c) {
       selected = null;
       renderAll();
-      resetHintTimer();
       return;
     }
     trySwap(selected, { r, c });
   }
 
   function startGame() {
-    clearTimeout(hintTimer);
     clearTimeout(toastTimer);
     toastEl.classList.add("hidden");
     fxLayer.innerHTML = "";
@@ -565,7 +526,6 @@
     buildBoardDom();
     updateHud();
     renderAll();
-    resetHintTimer();
   }
 
   restartBtn.addEventListener("click", () => {
@@ -575,17 +535,9 @@
 
   shuffleBtn.addEventListener("click", () => {
     if (busy) return;
-    clearHints();
     selected = null;
     reshuffleUntilPlayable();
     renderAll();
-    resetHintTimer();
-  });
-
-  hintBtn.addEventListener("click", () => {
-    if (busy) return;
-    showHint(true);
-    resetHintTimer();
   });
 
   boardEl.addEventListener(
