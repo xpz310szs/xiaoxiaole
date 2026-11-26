@@ -1,5 +1,8 @@
-# 星钻消消 · Match Jewel
+# 星钻小游戏
 
-Classic match-3 (消消乐) web game — static HTML/CSS/JS.
+侧边栏可玩的双游戏合集（静态 HTML/CSS/JS）：
 
-Open `index.html` or serve the folder locally.
+- [星钻消消](match3/) — 三消
+- [星钻方块](tetris/) — 类俄罗斯方块
+
+本地预览：在仓库根目录执行 `python3 -m http.server 8765 --bind 127.0.0.1`，打开 http://127.0.0.1:8765/

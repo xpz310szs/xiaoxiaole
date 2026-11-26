@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="google" content="notranslate" />
+  <title>星钻消消</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="sky" aria-hidden="true">
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="cloud c3"></div>
+    <div class="sparkle s1"></div>
+    <div class="sparkle s2"></div>
+    <div class="sparkle s3"></div>
+  </div>
+
+  <main class="stage">
+    <header class="top-bar">
+      <a class="back-link" href="../index.html" aria-label="返回游戏大厅">← 大厅</a>
+      <div class="logo-block">
+        <p class="logo-en">MATCH JEWEL</p>
+        <h1 class="logo">星钻消消</h1>
+      </div>
+      <button type="button" class="icon-btn" id="restart" aria-label="重新开始" title="重开">↻</button>
+    </header>
+
+    <section class="hud" aria-label="对局状态">
+      <div class="badge score-badge">
+        <span class="badge-label">得分</span>
+        <span class="badge-value" id="score">0</span>
+      </div>
+      <div class="badge best-badge">
+        <span class="badge-label">最高</span>
+        <span class="badge-value" id="best">0</span>
+      </div>
+      <div class="badge combo-badge">
+        <span class="badge-label">连击</span>
+        <span class="badge-value" id="combo">×1</span>
+      </div>
+    </section>
+
+    <div class="board-frame">
+      <div class="board-shine" aria-hidden="true"></div>
+      <div class="board-wrap">
+        <div id="fx-layer" class="fx-layer" aria-hidden="true"></div>
+        <div id="board" class="board" role="grid" aria-label="8×8 棋盘"></div>
+        <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <p class="hint-line">滑动相邻图案交换 · 三连即可消除</p>
+
+    <section class="controls" aria-label="操作">
+      <button type="button" class="btn hint" id="hint">提示</button>
+      <button type="button" class="btn shuffle" id="shuffle">重排</button>
+    </section>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>

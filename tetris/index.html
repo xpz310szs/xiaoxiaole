@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="google" content="notranslate" />
+  <title>星钻方块</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="sky" aria-hidden="true"></div>
+
+  <main class="stage">
+    <header class="top-bar">
+      <a class="back-link" href="../index.html">← 大厅</a>
+      <div class="logo-block">
+        <p class="logo-en">BLOCK DROP</p>
+        <h1 class="logo">星钻方块</h1>
+      </div>
+      <button type="button" class="icon-btn" id="pause" aria-label="暂停">❚❚</button>
+    </header>
+
+    <section class="hud" aria-label="状态">
+      <div class="badge">
+        <span class="badge-label">得分</span>
+        <span class="badge-value" id="score">0</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">行数</span>
+        <span class="badge-value" id="lines">0</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">等级</span>
+        <span class="badge-value" id="level">1</span>
+      </div>
+      <div class="badge best">
+        <span class="badge-label">最高</span>
+        <span class="badge-value" id="best">0</span>
+      </div>
+    </section>
+
+    <div class="play-row">
+      <div class="side-panel">
+        <div class="mini-card">
+          <span class="mini-label">下一个</span>
+          <canvas id="next" width="96" height="96" aria-label="下一个方块"></canvas>
+        </div>
+        <div class="mini-card">
+          <span class="mini-label">暂存</span>
+          <canvas id="hold" width="96" height="96" aria-label="暂存方块"></canvas>
+          <button type="button" class="mini-btn" id="hold-btn">HOLD</button>
+        </div>
+      </div>
+
+      <div class="board-frame">
+        <canvas id="board" width="300" height="600" aria-label="方块棋盘"></canvas>
+        <div id="overlay" class="overlay hidden" role="dialog" aria-modal="true">
+          <div class="overlay-card">
+            <p class="overlay-kicker" id="overlay-kicker">暂停</p>
+            <h2 id="overlay-title">休息一下</h2>
+            <p class="overlay-score">得分 <strong id="final-score">0</strong></p>
+            <button type="button" class="btn primary" id="resume">继续</button>
+            <button type="button" class="btn secondary" id="restart">重开</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="hint-line">滑动左右移动 · 上滑/点旋转 · 下滑加速 · 双击硬降</p>
+
+    <section class="pad" aria-label="触控按键">
+      <button type="button" class="pad-btn" data-act="left" aria-label="左移">◀</button>
+      <button type="button" class="pad-btn" data-act="rotate" aria-label="旋转">↻</button>
+      <button type="button" class="pad-btn" data-act="right" aria-label="右移">▶</button>
+      <button type="button" class="pad-btn wide" data-act="soft" aria-label="软降">▼ 软降</button>
+      <button type="button" class="pad-btn wide hot" data-act="hard" aria-label="硬降">⬇ 落地</button>
+    </section>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
