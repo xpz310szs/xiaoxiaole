@@ -141,6 +141,10 @@ body {
   animation-delay: 0.08s;
 }
 
+.game-card:nth-child(3) {
+  animation-delay: 0.14s;
+}
+
 .game-card:active {
   transform: translateY(3px);
   box-shadow: 0 6px 0 rgba(80, 50, 20, 0.18);
@@ -152,6 +156,10 @@ body {
 
 .game-card.tetris {
   background: linear-gradient(135deg, #e8f6ff 0%, #b7ddff 100%);
+}
+
+.game-card.zen {
+  background: linear-gradient(135deg, #eafff5 0%, #c9f5e4 100%);
 }
 
 .preview {
@@ -214,6 +222,32 @@ body {
 .preview.blocks span:nth-child(7),
 .preview.blocks span:nth-child(8) {
   background: #ff6b9d;
+}
+
+.preview.bubbles {
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 5px;
+}
+
+.preview.bubbles span {
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 28%, #fff, #9ad8ff 55%, #4f9fd0);
+  box-shadow: inset -2px -2px 4px rgba(0, 40, 80, 0.2);
+}
+
+.preview.bubbles span:nth-child(2) {
+  background: radial-gradient(circle at 30% 28%, #fff, #7defc4 55%, #2fa87a);
+}
+
+.preview.bubbles span:nth-child(3),
+.preview.bubbles span:nth-child(6) {
+  background: radial-gradient(circle at 30% 28%, #fff, #ffb4a2 55%, #e07a5f);
+}
+
+.preview.bubbles span:nth-child(4),
+.preview.bubbles span:nth-child(7) {
+  background: radial-gradient(circle at 30% 28%, #fff, #ffe08a 55%, #e0b040);
 }
 
 .meta h2 {
