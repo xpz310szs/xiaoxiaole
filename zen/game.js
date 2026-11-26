@@ -65,19 +65,81 @@
     noise.stop(t0 + 0.06);
   }
 
+  /** Mechanical toggle: scrape + sharp seat click (on sharper, off deeper). */
   function clickSound(on) {
     const ctx = ensureAudio();
     if (!ctx) return;
-    const osc = ctx.createOscillator();
-    const g = ctx.createGain();
-    osc.type = "square";
-    osc.frequency.value = on ? 520 : 280;
-    g.gain.value = 0.03;
-    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
-    osc.connect(g);
-    g.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.05);
+    const t0 = ctx.currentTime;
+    const jitter = Math.random() * 0.012;
+
+    // Contact scrape (short band-limited noise)
+    const scrapeLen = Math.floor(ctx.sampleRate * 0.018);
+    const scrapeBuf = ctx.createBuffer(1, scrapeLen, ctx.sampleRate);
+    const scrapeData = scrapeBuf.getChannelData(0);
+    for (let i = 0; i < scrapeLen; i++) {
+      const env = Math.pow(1 - i / scrapeLen, 1.8);
+      scrapeData[i] = (Math.random() * 2 - 1) * env;
+    }
+    const scrape = ctx.createBufferSource();
+    scrape.buffer = scrapeBuf;
+    const scrapeFilter = ctx.createBiquadFilter();
+    scrapeFilter.type = "bandpass";
+    scrapeFilter.frequency.value = on ? 2400 : 1600;
+    scrapeFilter.Q.value = 1.2;
+    const scrapeGain = ctx.createGain();
+    scrapeGain.gain.setValueAtTime(0.055, t0);
+    scrapeGain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.02);
+    scrape.connect(scrapeFilter);
+    scrapeFilter.connect(scrapeGain);
+    scrapeGain.connect(ctx.destination);
+    scrape.start(t0);
+    scrape.stop(t0 + 0.025);
+
+    // Seat / latch click (layered tones + tiny noise tick)
+    const seatAt = t0 + 0.012 + jitter;
+    const tickLen = Math.floor(ctx.sampleRate * 0.01);
+    const tickBuf = ctx.createBuffer(1, tickLen, ctx.sampleRate);
+    const tickData = tickBuf.getChannelData(0);
+    for (let i = 0; i < tickLen; i++) {
+      tickData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / tickLen, 4);
+    }
+    const tick = ctx.createBufferSource();
+    tick.buffer = tickBuf;
+    const tickHp = ctx.createBiquadFilter();
+    tickHp.type = "highpass";
+    tickHp.frequency.value = on ? 1800 : 900;
+    const tickGain = ctx.createGain();
+    tickGain.gain.setValueAtTime(0.07, seatAt);
+    tickGain.gain.exponentialRampToValueAtTime(0.001, seatAt + 0.03);
+    tick.connect(tickHp);
+    tickHp.connect(tickGain);
+    tickGain.connect(ctx.destination);
+    tick.start(seatAt);
+    tick.stop(seatAt + 0.035);
+
+    const body = ctx.createOscillator();
+    const bodyGain = ctx.createGain();
+    body.type = "triangle";
+    body.frequency.setValueAtTime(on ? 380 : 220, seatAt);
+    body.frequency.exponentialRampToValueAtTime(on ? 140 : 90, seatAt + 0.05);
+    bodyGain.gain.setValueAtTime(0.045, seatAt);
+    bodyGain.gain.exponentialRampToValueAtTime(0.001, seatAt + 0.06);
+    body.connect(bodyGain);
+    bodyGain.connect(ctx.destination);
+    body.start(seatAt);
+    body.stop(seatAt + 0.07);
+
+    // Plastic shell resonance (very short)
+    const shell = ctx.createOscillator();
+    const shellGain = ctx.createGain();
+    shell.type = "sine";
+    shell.frequency.value = on ? 980 : 620;
+    shellGain.gain.setValueAtTime(0.02, seatAt);
+    shellGain.gain.exponentialRampToValueAtTime(0.001, seatAt + 0.04);
+    shell.connect(shellGain);
+    shellGain.connect(ctx.destination);
+    shell.start(seatAt);
+    shell.stop(seatAt + 0.045);
   }
 
   function squishSound() {
@@ -161,7 +223,8 @@
       btn.type = "button";
       btn.className = "switch";
       btn.innerHTML = `<span class="switch-track"><span class="switch-knob"></span></span><span class="switch-label">${label}</span>`;
-      btn.addEventListener("click", () => {
+      btn.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
         ensureAudio();
         const on = !btn.classList.contains("on");
         btn.classList.toggle("on", on);
