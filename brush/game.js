@@ -118,6 +118,43 @@
     }
   }
 
+  function makePlaque(tooth, opts) {
+    const fx = opts.fx;
+    const fy = opts.fy;
+    const fw = opts.fw;
+    const fh = opts.fh;
+    return {
+      toothId: tooth.id,
+      fx,
+      fy,
+      fw,
+      fh,
+      x: tooth.x + tooth.w * fx,
+      y: tooth.y + tooth.h * fy,
+      w: tooth.w * fw,
+      h: tooth.h * fh,
+      kind: opts.kind,
+      hp: opts.hp,
+      max: opts.max,
+      rot: opts.rot,
+    };
+  }
+
+  function syncPlaquesToTeeth() {
+    const byId = Object.create(null);
+    teeth.forEach((t) => {
+      byId[t.id] = t;
+    });
+    plaques.forEach((p) => {
+      const tooth = byId[p.toothId];
+      if (!tooth) return;
+      p.x = tooth.x + tooth.w * p.fx;
+      p.y = tooth.y + tooth.h * p.fy;
+      p.w = tooth.w * p.fw;
+      p.h = tooth.h * p.fh;
+    });
+  }
+
   function spawnPlaques() {
     plaques = [];
     const density = Math.min(0.35 + level * 0.08, 0.85);
@@ -128,38 +165,38 @@
       for (let i = 0; i < n; i += 1) {
         if (Math.random() > density && i > 0) continue;
         const isTartar = Math.random() < tartarChance;
-        const pw = tooth.w * (0.28 + Math.random() * 0.28);
-        const ph = tooth.h * (0.22 + Math.random() * 0.28);
-        const px = tooth.x + tooth.w * (0.12 + Math.random() * 0.5);
-        const py = tooth.y + tooth.h * (0.15 + Math.random() * 0.45);
-        plaques.push({
-          toothId: tooth.id,
-          x: px,
-          y: py,
-          w: pw,
-          h: ph,
-          kind: isTartar ? "tartar" : "plaque",
-          hp: isTartar ? 42 + level * 8 : 22 + level * 5,
-          max: isTartar ? 42 + level * 8 : 22 + level * 5,
-          rot: (Math.random() - 0.5) * 0.7,
-        });
+        const hp = isTartar ? 42 + level * 8 : 22 + level * 5;
+        plaques.push(
+          makePlaque(tooth, {
+            fx: 0.12 + Math.random() * 0.5,
+            fy: 0.15 + Math.random() * 0.45,
+            fw: 0.28 + Math.random() * 0.28,
+            fh: 0.22 + Math.random() * 0.28,
+            kind: isTartar ? "tartar" : "plaque",
+            hp,
+            max: hp,
+            rot: (Math.random() - 0.5) * 0.7,
+          })
+        );
       }
     });
 
     if (plaques.length < 6) {
       const extras = teeth.slice(0, 6 - plaques.length);
       extras.forEach((tooth) => {
-        plaques.push({
-          toothId: tooth.id,
-          x: tooth.x + tooth.w * 0.25,
-          y: tooth.y + tooth.h * 0.3,
-          w: tooth.w * 0.4,
-          h: tooth.h * 0.3,
-          kind: "plaque",
-          hp: 24 + level * 4,
-          max: 24 + level * 4,
-          rot: 0.1,
-        });
+        const hp = 24 + level * 4;
+        plaques.push(
+          makePlaque(tooth, {
+            fx: 0.25,
+            fy: 0.3,
+            fw: 0.4,
+            fh: 0.3,
+            kind: "plaque",
+            hp,
+            max: hp,
+            rot: 0.1,
+          })
+        );
       });
     }
   }
@@ -595,19 +632,10 @@
   });
 
   window.addEventListener("resize", () => {
-    const prevW = W || 1;
-    const prevH = H || 1;
     resize();
     if (!teeth.length) return;
-    const sx = W / prevW;
-    const sy = H / prevH;
     layoutTeeth();
-    plaques.forEach((p) => {
-      p.x *= sx;
-      p.y *= sy;
-      p.w *= sx;
-      p.h *= sy;
-    });
+    syncPlaquesToTeeth();
     updateHud();
   });
 
