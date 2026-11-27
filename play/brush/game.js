@@ -88,9 +88,10 @@
     const count = 8;
     const marginX = W * 0.08;
     const toothW = (W - marginX * 2) / count;
-    const upperY = H * 0.28;
-    const lowerY = H * 0.58;
-    const toothH = Math.min(H * 0.22, 78);
+    const compact = H < 360;
+    const upperY = H * (compact ? 0.22 : 0.28);
+    const lowerY = H * (compact ? 0.52 : 0.58);
+    const toothH = Math.min(H * (compact ? 0.2 : 0.22), compact ? 56 : 78);
     teeth = [];
 
     for (let i = 0; i < count; i += 1) {
