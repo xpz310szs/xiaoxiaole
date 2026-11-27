@@ -180,6 +180,10 @@ body {
   background: linear-gradient(135deg, #e4f4ff 0%, #c8ecff 100%);
 }
 
+.game-card.quiz {
+  background: linear-gradient(135deg, #fff0d8 0%, #ffe0a8 100%);
+}
+
 .preview {
   width: 78px;
   height: 78px;
@@ -422,6 +426,40 @@ body {
   height: 20px;
   border-radius: 50%;
   background: linear-gradient(180deg, #5ad67a, #2db88a);
+}
+
+.preview.quiz-mini {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 4px;
+  padding: 10px;
+  place-items: center;
+}
+
+.preview.quiz-mini .qmark {
+  grid-column: 1 / -1;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: #ff7a2e;
+  line-height: 1;
+}
+
+.preview.quiz-mini .opt {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 122, 46, 0.25);
+}
+
+.preview.quiz-mini .opt.a {
+  background: linear-gradient(90deg, #ff9a4a, #ff7a2e);
+}
+
+.preview.quiz-mini .opt.b,
+.preview.quiz-mini .opt.c {
+  background: rgba(42, 53, 80, 0.12);
 }
 
 .meta h2 {
