@@ -26,14 +26,6 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-body.playing {
-  overflow: hidden;
-  height: 100%;
-}
-
-.hidden {
-  display: none !important;
-}
 
 .sky {
   position: fixed;
@@ -145,10 +137,6 @@ body.playing {
   box-shadow: 0 10px 0 rgba(80, 50, 20, 0.18);
   transition: transform 0.15s ease;
   opacity: 1;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  font: inherit;
 }
 
 .game-card:active {
@@ -393,18 +381,4 @@ body.playing {
   box-shadow: 0 4px 0 #c43a12;
 }
 
-.player {
-  position: fixed;
-  inset: 0;
-  z-index: 20;
-  background: #111;
-}
-
-.player iframe {
-  border: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  background: #fff;
-}
 

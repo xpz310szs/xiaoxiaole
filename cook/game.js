@@ -148,13 +148,23 @@
   }
 
   function renderTray(keys) {
-    el.tray.innerHTML = keys.map((key) => {
+    el.tray.replaceChildren();
+    keys.forEach((key) => {
       const ing = INGS[key];
-      return `<button type="button" class="ing" data-key="${key}" aria-label="${ing.name}">
-        <span class="emoji">${ing.emoji}</span>
-        <span class="name">${ing.name}</span>
-      </button>`;
-    }).join("");
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "ing";
+      btn.dataset.key = key;
+      btn.setAttribute("aria-label", ing.name);
+      const emoji = document.createElement("span");
+      emoji.className = "emoji";
+      emoji.textContent = ing.emoji;
+      const name = document.createElement("span");
+      name.className = "name";
+      name.textContent = ing.name;
+      btn.append(emoji, name);
+      el.tray.append(btn);
+    });
   }
 
   function trayForOrder(recipe) {
@@ -166,9 +176,13 @@
   }
 
   function renderPlate() {
-    el.plate.innerHTML = built
-      .map((key) => `<span class="bit">${INGS[key].emoji}</span>`)
-      .join("");
+    el.plate.replaceChildren();
+    built.forEach((key) => {
+      const bit = document.createElement("span");
+      bit.className = "bit";
+      bit.textContent = INGS[key].emoji;
+      el.plate.append(bit);
+    });
   }
 
   function nextNeeded() {

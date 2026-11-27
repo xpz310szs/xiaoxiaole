@@ -1,0 +1,244 @@
+:root {
+  --ink: #243044;
+  --muted: #5f7088;
+  --font-display: "Fredoka", "Noto Sans SC", sans-serif;
+  --font-body: "Noto Sans SC", "Fredoka", sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: #7ec8ff;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.55), transparent 28%),
+    linear-gradient(180deg, #5bb8ff 0%, #9ad4ff 42%, #ffe9b0 100%);
+}
+
+.stage {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 440px);
+  height: 100dvh;
+  margin: 0 auto;
+  padding: 0.55rem 0.7rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  overflow: hidden;
+}
+
+.top-bar {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.back-link,
+.icon-btn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--ink);
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.75);
+  border: 2px solid #fff;
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+  box-shadow: 0 3px 0 rgba(40, 70, 120, 0.16);
+}
+
+.icon-btn {
+  cursor: pointer;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1.05rem;
+}
+
+.icon-btn.muted {
+  opacity: 0.45;
+}
+
+.logo-block {
+  text-align: center;
+}
+
+.logo-en {
+  margin: 0;
+  font-family: var(--font-display);
+  letter-spacing: 0.16em;
+  font-size: 0.58rem;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.logo {
+  margin: 0.05rem 0 0;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: #fff;
+  text-shadow:
+    0 2px 0 #2f7fd0,
+    0 5px 12px rgba(40, 100, 180, 0.35);
+}
+
+.hud {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.35rem;
+}
+
+.badge {
+  background: rgba(255, 255, 255, 0.78);
+  border: 2px solid #fff;
+  border-radius: 12px;
+  padding: 0.3rem 0.45rem;
+  box-shadow: 0 3px 0 rgba(40, 70, 120, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.badge-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.badge-value {
+  font-family: var(--font-display);
+  font-size: 1rem;
+}
+
+.board-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 160px;
+  width: 100%;
+  border-radius: 18px;
+  border: 3px solid #fff;
+  background: #1e3a55;
+  box-shadow: 0 8px 0 rgba(40, 70, 120, 0.14);
+  overflow: hidden;
+}
+
+#game {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 0.35rem;
+  background: rgba(20, 40, 70, 0.55);
+  backdrop-filter: blur(3px);
+  text-align: center;
+  padding: 1rem;
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+.overlay-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: #fff;
+}
+
+.overlay-sub {
+  margin: 0 0 0.4rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.overlay-btn,
+.jump-btn {
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: #fff;
+  border-radius: 999px;
+}
+
+.overlay-btn {
+  justify-self: center;
+  font-size: 1rem;
+  background: linear-gradient(180deg, #ff9a4a, #ff5a2a);
+  padding: 0.65rem 1.3rem;
+  box-shadow: 0 4px 0 #c43a12;
+}
+
+.overlay-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #c43a12;
+}
+
+.tip {
+  flex: 0 0 auto;
+  margin: 0;
+  text-align: center;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 0.78rem;
+}
+
+.jump-btn {
+  flex: 0 0 auto;
+  width: 100%;
+  font-size: 1.35rem;
+  padding: 0.85rem 1rem;
+  background: linear-gradient(180deg, #5be0a4, #1fa86a);
+  border: 3px solid #fff;
+  box-shadow: 0 5px 0 #157a4c;
+}
+
+.jump-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #157a4c;
+}
+
+@media (max-height: 640px) {
+  .tip,
+  .logo-en {
+    display: none;
+  }
+
+  .jump-btn {
+    padding: 0.7rem 1rem;
+    font-size: 1.2rem;
+  }
+}

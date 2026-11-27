@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="google" content="notranslate" />
+  <title>星钻迷宫</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="maze/styles.css" />
+</head>
+<body>
+  <div class="bg" aria-hidden="true">
+    <div class="glow g1"></div>
+    <div class="glow g2"></div>
+  </div>
+
+  <main class="stage">
+    <header class="top-bar">
+      <a class="back-link" href="./" target="_parent">← 大厅</a>
+      <div class="logo-block">
+        <p class="logo-en">STAR MAZE</p>
+        <h1 class="logo">星钻迷宫</h1>
+      </div>
+      <button type="button" class="icon-btn" id="new-maze" aria-label="新迷宫" title="新迷宫">↻</button>
+    </header>
+
+    <section class="hud" aria-label="状态">
+      <div class="badge">
+        <span class="badge-label">用时</span>
+        <span class="badge-value" id="time">0:00</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">步数</span>
+        <span class="badge-value" id="steps">0</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">通关</span>
+        <span class="badge-value" id="wins">0</span>
+      </div>
+    </section>
+
+    <div class="levels" role="group" aria-label="难度">
+      <button type="button" class="level" data-size="9">简单</button>
+      <button type="button" class="level active" data-size="13">普通</button>
+      <button type="button" class="level" data-size="17">困难</button>
+    </div>
+
+    <section class="board-wrap">
+      <canvas id="maze" width="360" height="360" aria-label="迷宫，用方向键或下方按钮移动"></canvas>
+      <div id="win" class="win hidden" role="status">
+        <p class="win-title">找到出口了！</p>
+        <p class="win-sub" id="win-sub">太棒了</p>
+        <button type="button" class="win-btn" id="again">再来一局</button>
+      </div>
+    </section>
+
+    <p class="tip">滑动或点方向键前进 · 黄点是出口</p>
+
+    <div class="pad" aria-label="方向控制">
+      <button type="button" class="pad-btn" data-dir="up" aria-label="上">▲</button>
+      <div class="pad-mid">
+        <button type="button" class="pad-btn" data-dir="left" aria-label="左">◀</button>
+        <button type="button" class="pad-btn" data-dir="down" aria-label="下">▼</button>
+        <button type="button" class="pad-btn" data-dir="right" aria-label="右">▶</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="maze/game.js"></script>
+</body>
+</html>
