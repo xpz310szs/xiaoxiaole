@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="google" content="notranslate" />
+  <title>星钻解压</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="zen/styles.css" />
+</head>
+<body>
+  <div class="bg" aria-hidden="true">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+  </div>
+
+  <main class="stage">
+    <header class="top-bar">
+      <a class="back-link" href="./">← 大厅</a>
+      <div class="logo-block">
+        <p class="logo-en">CHILL ZONE</p>
+        <h1 class="logo">星钻解压</h1>
+      </div>
+      <button type="button" class="icon-btn" id="reset" aria-label="重置" title="重置">↻</button>
+    </header>
+
+    <section class="hud" aria-label="状态">
+      <div class="badge">
+        <span class="badge-label">戳破</span>
+        <span class="badge-value" id="pops">0</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">连戳</span>
+        <span class="badge-value" id="streak">0</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">最高连戳</span>
+        <span class="badge-value" id="best">0</span>
+      </div>
+    </section>
+
+    <div class="tabs" role="tablist" aria-label="解压工具">
+      <button type="button" class="tab active" data-panel="bubbles" role="tab" aria-selected="true">泡泡纸</button>
+      <button type="button" class="tab" data-panel="dough" role="tab" aria-selected="false">捏捏球</button>
+      <button type="button" class="tab" data-panel="switches" role="tab" aria-selected="false">开关墙</button>
+    </div>
+
+    <section id="panel-bubbles" class="panel active" role="tabpanel">
+      <div id="wrap" class="bubble-wrap" aria-label="泡泡纸，点击戳破"></div>
+      <p class="tip">点一下戳破 · 滑过连戳 · 戳完自动补新</p>
+    </section>
+
+    <section id="panel-dough" class="panel" role="tabpanel" hidden>
+      <div class="dough-stage">
+        <button type="button" id="dough" class="dough" aria-label="捏捏球，按住揉捏">
+          <span class="dough-shine"></span>
+        </button>
+      </div>
+      <p class="tip">按住拖动揉捏 · 松手回弹</p>
+    </section>
+
+    <section id="panel-switches" class="panel" role="tabpanel" hidden>
+      <div id="switch-wall" class="switch-wall" aria-label="开关墙"></div>
+      <p class="tip">按下会有真实墙开的咔哒声 · 开/关音色不同</p>
+    </section>
+  </main>
+
+  <script src="zen/game.js"></script>
+</body>
+</html>
