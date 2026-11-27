@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="google" content="notranslate" />
+  <title>星钻打怪</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="battle/styles.css" />
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <main class="stage">
+    <header class="top-bar">
+      <a class="back-link" href="./" target="_parent">← 大厅</a>
+      <div class="logo-block">
+        <p class="logo-en">STAR BATTLE</p>
+        <h1 class="logo">星钻打怪</h1>
+      </div>
+      <button type="button" class="icon-btn" id="mute" aria-label="声音">♪</button>
+    </header>
+
+    <section class="hud" aria-label="状态">
+      <div class="badge">
+        <span class="badge-label">波次</span>
+        <span class="badge-value" id="wave">1</span>
+      </div>
+      <div class="badge wide">
+        <span class="badge-label">生命</span>
+        <div class="hp-bar" aria-hidden="true"><i id="hp-fill"></i></div>
+        <span class="badge-value" id="hp">5</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">击败</span>
+        <span class="badge-value" id="kills">0</span>
+      </div>
+    </section>
+
+    <section class="board-wrap">
+      <canvas id="game" width="400" height="280" aria-label="打怪画面"></canvas>
+      <div id="overlay" class="overlay">
+        <p class="overlay-title" id="overlay-title">小人出击！</p>
+        <p class="overlay-sub" id="overlay-sub">左右移动 · 跳跃 · 攻击打败怪物</p>
+        <button type="button" class="overlay-btn" id="start">开始战斗</button>
+      </div>
+    </section>
+
+    <p class="tip">← → 移动 · ↑ / 跳 二段跳 · 攻击打怪</p>
+
+    <div class="controls" aria-label="操作">
+      <div class="pad">
+        <button type="button" class="ctrl" id="left" aria-label="左移">←</button>
+        <button type="button" class="ctrl" id="jump" aria-label="跳跃">跳</button>
+        <button type="button" class="ctrl" id="right" aria-label="右移">→</button>
+      </div>
+      <button type="button" class="ctrl attack" id="attack" aria-label="攻击">打！</button>
+    </div>
+  </main>
+
+  <script src="battle/game.js"></script>
+</body>
+</html>

@@ -176,6 +176,10 @@ body {
   background: linear-gradient(135deg, #ffe8f4 0%, #ffd0e8 100%);
 }
 
+.game-card.battle {
+  background: linear-gradient(135deg, #e4f4ff 0%, #c8ecff 100%);
+}
+
 .preview {
   width: 78px;
   height: 78px;
@@ -389,6 +393,36 @@ body {
   height: 28px;
   border-radius: 10px 10px 14px 14px;
   background: linear-gradient(180deg, #ff8fbf, #ff4f8f);
+}
+
+.preview.battle-mini {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+}
+
+.preview.battle-mini .hero-dot {
+  width: 18px;
+  height: 26px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffd7c2 35%, #3db7ff 36%);
+}
+
+.preview.battle-mini .slash {
+  width: 18px;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ffe56a, #ff7a2e);
+  transform: rotate(-28deg);
+}
+
+.preview.battle-mini .mob-dot {
+  width: 22px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #5ad67a, #2db88a);
 }
 
 .meta h2 {
