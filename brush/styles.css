@@ -275,6 +275,27 @@ body {
   box-shadow: 0 4px 0 #2eb89a;
 }
 
+.tool.has-paste {
+  position: relative;
+}
+
+.tool.has-paste::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, #7ee0c8 55%, #2eb89a);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 0 rgba(40, 100, 90, 0.2);
+}
+
+.tool[data-tool="paste"]:active {
+  transform: translateY(2px);
+}
+
 .hint {
   flex: 0 0 auto;
   margin: 0;
