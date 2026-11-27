@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="google" content="notranslate" />
+  <title>星钻静心</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <canvas id="sky" aria-hidden="true"></canvas>
+
+  <main class="stage">
+    <header class="top-bar">
+      <a class="back-link" href="../" target="_parent">← 大厅</a>
+      <div class="logo-block">
+        <p class="logo-en">QUIET MIND</p>
+        <h1 class="logo">星钻静心</h1>
+      </div>
+      <button type="button" class="icon-btn" id="mute" aria-label="静音" title="声音">♪</button>
+    </header>
+
+    <section class="hud" aria-live="polite">
+      <div class="badge">
+        <span class="badge-label">已静心</span>
+        <span class="badge-value" id="minutes">0:00</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">呼吸轮次</span>
+        <span class="badge-value" id="cycles">0</span>
+      </div>
+    </section>
+
+    <div class="modes" role="tablist" aria-label="放松模式">
+      <button type="button" class="mode active" data-mode="breath" role="tab" aria-selected="true">呼吸</button>
+      <button type="button" class="mode" data-mode="stars" role="tab" aria-selected="false">星空</button>
+      <button type="button" class="mode" data-mode="pond" role="tab" aria-selected="false">涟漪</button>
+    </div>
+
+    <section id="panel-breath" class="panel active" role="tabpanel">
+      <div class="breath-stage">
+        <button type="button" id="breath" class="breath" aria-label="跟随呼吸圆圈">
+          <span class="breath-ring"></span>
+          <span class="breath-core"></span>
+          <span class="breath-label" id="breath-label">点一下开始</span>
+        </button>
+      </div>
+      <p class="tip">跟着圆圈慢慢吸气、呼气 · 不用想别的</p>
+      <div class="pace" aria-label="呼吸节奏">
+        <button type="button" class="pace-btn" data-pace="slow">慢</button>
+        <button type="button" class="pace-btn active" data-pace="mid">适中</button>
+        <button type="button" class="pace-btn" data-pace="soft">轻柔</button>
+      </div>
+    </section>
+
+    <section id="panel-stars" class="panel" role="tabpanel" hidden>
+      <div class="touch-stage" id="star-stage" aria-label="轻触点亮星光">
+        <p class="stage-hint" id="star-hint">轻轻点或滑动 · 点亮小星星</p>
+      </div>
+      <p class="tip">慢一点 · 看着它们慢慢亮起又淡去</p>
+    </section>
+
+    <section id="panel-pond" class="panel" role="tabpanel" hidden>
+      <div class="touch-stage pond" id="pond-stage" aria-label="轻触水面">
+        <p class="stage-hint" id="pond-hint">点一下水面 · 看涟漪散开</p>
+      </div>
+      <p class="tip">一次一点就好 · 等涟漪安静下来</p>
+    </section>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,352 @@
+:root {
+  --ink: #3a2a1f;
+  --muted: #7a6554;
+  --font-display: "Fredoka", "Noto Sans SC", sans-serif;
+  --font-body: "Noto Sans SC", "Fredoka", sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: #ffd7a8;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 15% 12%, rgba(255, 255, 255, 0.5), transparent 30%),
+    linear-gradient(180deg, #ffb070 0%, #ffd7a8 42%, #ffe9c8 100%);
+}
+
+.stage {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 440px);
+  height: 100dvh;
+  margin: 0 auto;
+  padding: 0.55rem 0.7rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  overflow: hidden;
+}
+
+.top-bar {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.back-link,
+.icon-btn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--ink);
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.78);
+  border: 2px solid #fff;
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+  box-shadow: 0 3px 0 rgba(140, 80, 30, 0.16);
+}
+
+.icon-btn {
+  cursor: pointer;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+.icon-btn.muted {
+  opacity: 0.45;
+}
+
+.logo-block {
+  text-align: center;
+}
+
+.logo-en {
+  margin: 0;
+  font-family: var(--font-display);
+  letter-spacing: 0.16em;
+  font-size: 0.58rem;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.logo {
+  margin: 0.05rem 0 0;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: #fff;
+  text-shadow:
+    0 2px 0 #e07a30,
+    0 5px 12px rgba(200, 90, 30, 0.35);
+}
+
+.hud {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.35rem;
+}
+
+.badge {
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid #fff;
+  border-radius: 12px;
+  padding: 0.3rem 0.45rem;
+  box-shadow: 0 3px 0 rgba(140, 80, 30, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.badge-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.badge-value {
+  font-family: var(--font-display);
+  font-size: 1rem;
+}
+
+.order-card {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.55rem 0.7rem;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.82);
+  border: 3px solid #fff;
+  border-radius: 18px;
+  padding: 0.65rem 0.75rem 0.55rem;
+  box-shadow: 0 6px 0 rgba(140, 80, 30, 0.12);
+}
+
+.customer {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 1.7rem;
+  background: linear-gradient(180deg, #fff7df, #ffd9a0);
+  border: 2px solid #fff;
+}
+
+.order-label {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.order-name {
+  margin: 0.05rem 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.order-steps {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #9a6a40;
+}
+
+.timer-wrap {
+  grid-column: 1 / -1;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 180, 120, 0.35);
+  overflow: hidden;
+}
+
+.timer-bar {
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #5be0a4, #ffd56a, #ff7a4a);
+  transform-origin: left center;
+  transition: transform 0.1s linear;
+}
+
+.station {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.35);
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  border-radius: 18px;
+  padding: 0.5rem;
+}
+
+.plate {
+  width: min(78%, 220px);
+  aspect-ratio: 1.15;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 45%, #fff, #f0e6d8 62%, #d8c8b0);
+  border: 4px solid #fff;
+  box-shadow:
+    inset 0 0 0 10px rgba(255, 255, 255, 0.35),
+    0 8px 0 rgba(140, 80, 30, 0.1);
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  gap: 0.2rem;
+  padding: 1rem;
+  overflow: hidden;
+}
+
+.plate .bit {
+  font-size: 1.55rem;
+  line-height: 1;
+  animation: pop 0.22s cubic-bezier(0.2, 0.9, 0.2, 1.2);
+}
+
+@keyframes pop {
+  from { transform: scale(0.5); opacity: 0.4; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.hint {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.tray {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.35rem;
+  max-height: 28dvh;
+  overflow: auto;
+}
+
+.ing {
+  border: 2px solid #fff;
+  border-radius: 14px;
+  background: linear-gradient(160deg, #fff, #ffe8d0);
+  cursor: pointer;
+  padding: 0.45rem 0.2rem;
+  display: grid;
+  gap: 0.1rem;
+  place-items: center;
+  box-shadow: 0 4px 0 rgba(140, 80, 30, 0.12);
+  font-family: var(--font-display);
+}
+
+.ing:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 rgba(140, 80, 30, 0.12);
+}
+
+.ing .emoji {
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.ing .name {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.actions {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 0.45rem;
+}
+
+.action {
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  border-radius: 999px;
+  padding: 0.7rem 0.8rem;
+}
+
+.action.ghost {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 0 rgba(140, 80, 30, 0.14);
+}
+
+.action.solid {
+  color: #fff;
+  background: linear-gradient(180deg, #ff9a4a, #ff5a2a);
+  box-shadow: 0 4px 0 #c43a12;
+}
+
+.action:active {
+  transform: translateY(2px);
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 18%;
+  transform: translateX(-50%);
+  z-index: 5;
+  background: rgba(40, 30, 20, 0.88);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.toast.hidden {
+  display: none;
+}
+
+@media (max-height: 680px) {
+  .logo-en {
+    display: none;
+  }
+
+  .order-steps {
+    display: none;
+  }
+
+  .plate .bit {
+    font-size: 1.3rem;
+  }
+}
