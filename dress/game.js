@@ -36,12 +36,36 @@
 
   const ITEMS = {
     hair: [
-      { id: "bob", name: "短发", swatch: "#5b3a2e", icon: "💇", html: svg(`<path d="M58 88 C55 48 78 28 100 28 C122 28 145 48 142 88 C138 112 128 118 118 112 C112 128 88 128 82 112 C72 118 62 112 58 88 Z" fill="#5b3a2e"/>`) },
-      { id: "twin", name: "双马尾", swatch: "#2d1f4a", icon: "🎀", html: svg(`<path d="M58 86 C54 46 78 24 100 24 C122 24 146 46 142 86 C136 108 126 116 116 110 C110 126 90 126 84 110 C74 116 64 108 58 86 Z" fill="#2d1f4a"/><ellipse cx="42" cy="118" rx="16" ry="28" fill="#2d1f4a"/><ellipse cx="158" cy="118" rx="16" ry="28" fill="#2d1f4a"/><circle cx="48" cy="92" r="7" fill="#ff6aa8"/><circle cx="152" cy="92" r="7" fill="#ff6aa8"/>`) },
-      { id: "long", name: "长发", swatch: "#c45c26", icon: "🧡", html: svg(`<path d="M52 90 C48 40 76 18 100 18 C124 18 152 40 148 90 C150 140 142 190 132 210 C120 170 118 130 116 108 C108 130 92 130 84 108 C82 130 80 170 68 210 C58 190 50 140 52 90 Z" fill="#c45c26"/>`) },
-      { id: "curly", name: "卷卷头", swatch: "#f2c14e", icon: "💛", html: svg(`<circle cx="68" cy="58" r="18" fill="#f2c14e"/><circle cx="100" cy="42" r="20" fill="#f2c14e"/><circle cx="132" cy="58" r="18" fill="#f2c14e"/><path d="M62 96 C64 54 84 34 100 34 C116 34 136 54 138 96 C130 118 118 120 112 110 C108 124 92 124 88 110 C82 120 70 118 62 96 Z" fill="#f2c14e"/>`) },
-      { id: "pixie", name: "精灵剪", swatch: "#3d6b5a", icon: "🌿", html: svg(`<path d="M62 92 C58 58 78 36 100 34 C124 32 144 54 140 88 C134 74 118 68 108 78 C104 58 90 58 86 76 C78 66 68 72 62 92 Z" fill="#3d6b5a"/>`) },
-      { id: "bun", name: "丸子头", swatch: "#4a2c1a", icon: "🍡", html: svg(`<circle cx="100" cy="34" r="18" fill="#4a2c1a"/><path d="M60 92 C56 52 78 34 100 34 C122 34 144 52 140 92 C132 112 120 116 112 108 C108 122 92 122 88 108 C80 116 68 112 60 92 Z" fill="#4a2c1a"/><circle cx="100" cy="34" r="8" fill="#ff8fbf"/>`) },
+      // Paths frame the crown/sides only — bangs stop above the eyes (y≈70) so the face stays clear.
+      { id: "bob", name: "短发", swatch: "#5b3a2e", icon: "💇", html: svg(`
+        <path d="M56 96 C52 52 74 24 100 24 C126 24 148 52 144 96 C138 118 128 124 120 116 C118 108 116 96 116 88 C116 68 108 56 100 56 C92 56 84 68 84 88 C84 96 82 108 80 116 C72 124 62 118 56 96 Z" fill="#5b3a2e"/>
+        <path d="M72 58 C82 48 92 52 100 50 C108 52 118 48 128 58 C120 66 110 64 100 62 C90 64 80 66 72 58 Z" fill="#5b3a2e"/>
+      `) },
+      { id: "twin", name: "双马尾", swatch: "#2d1f4a", icon: "🎀", html: svg(`
+        <path d="M56 94 C52 48 74 22 100 22 C126 22 148 48 144 94 C136 116 126 122 118 112 C116 100 114 90 114 82 C114 64 108 54 100 54 C92 54 86 64 86 82 C86 90 84 100 82 112 C74 122 64 116 56 94 Z" fill="#2d1f4a"/>
+        <path d="M74 56 C84 46 94 50 100 48 C106 50 116 46 126 56 C118 64 108 62 100 60 C92 62 82 64 74 56 Z" fill="#2d1f4a"/>
+        <ellipse cx="42" cy="118" rx="16" ry="28" fill="#2d1f4a"/><ellipse cx="158" cy="118" rx="16" ry="28" fill="#2d1f4a"/>
+        <circle cx="48" cy="92" r="7" fill="#ff6aa8"/><circle cx="152" cy="92" r="7" fill="#ff6aa8"/>
+      `) },
+      { id: "long", name: "长发", swatch: "#c45c26", icon: "🧡", html: svg(`
+        <path d="M50 98 C46 44 74 16 100 16 C126 16 154 44 150 98 C152 150 144 198 134 218 C124 180 122 140 120 112 C118 102 116 92 116 84 C116 64 108 52 100 52 C92 52 84 64 84 84 C84 92 82 102 80 112 C78 140 76 180 66 218 C56 198 48 150 50 98 Z" fill="#c45c26"/>
+        <path d="M70 54 C82 42 92 48 100 46 C108 48 118 42 130 54 C120 64 110 60 100 58 C90 60 80 64 70 54 Z" fill="#c45c26"/>
+      `) },
+      { id: "curly", name: "卷卷头", swatch: "#f2c14e", icon: "💛", html: svg(`
+        <circle cx="68" cy="52" r="16" fill="#f2c14e"/><circle cx="100" cy="36" r="18" fill="#f2c14e"/><circle cx="132" cy="52" r="16" fill="#f2c14e"/>
+        <circle cx="56" cy="78" r="14" fill="#f2c14e"/><circle cx="144" cy="78" r="14" fill="#f2c14e"/>
+        <path d="M62 100 C60 58 80 40 100 40 C120 40 140 58 138 100 C130 118 120 116 116 104 C114 92 110 82 100 82 C90 82 86 92 84 104 C80 116 70 118 62 100 Z" fill="#f2c14e"/>
+        <path d="M78 58 C88 50 96 54 100 52 C104 54 112 50 122 58 C114 66 106 62 100 60 C94 62 86 66 78 58 Z" fill="#f2c14e"/>
+      `) },
+      { id: "pixie", name: "精灵剪", swatch: "#3d6b5a", icon: "🌿", html: svg(`
+        <path d="M60 92 C54 56 76 30 100 28 C126 26 148 52 142 90 C134 74 120 66 112 74 C108 56 92 56 88 74 C80 66 68 72 60 92 Z" fill="#3d6b5a"/>
+        <path d="M78 54 C88 46 96 50 100 48 C104 50 112 46 122 54 C114 60 106 58 100 56 C94 58 86 60 78 54 Z" fill="#3d6b5a"/>
+      `) },
+      { id: "bun", name: "丸子头", swatch: "#4a2c1a", icon: "🍡", html: svg(`
+        <circle cx="100" cy="30" r="18" fill="#4a2c1a"/><circle cx="100" cy="30" r="8" fill="#ff8fbf"/>
+        <path d="M58 96 C54 50 76 28 100 28 C124 28 146 50 142 96 C134 116 124 120 118 110 C116 98 114 88 114 80 C114 62 108 52 100 52 C92 52 86 62 86 80 C86 88 84 98 82 110 C76 120 66 116 58 96 Z" fill="#4a2c1a"/>
+        <path d="M74 54 C86 44 94 48 100 46 C106 48 114 44 126 54 C116 62 108 58 100 56 C92 58 84 62 74 54 Z" fill="#4a2c1a"/>
+      `) },
     ],
     face: [
       { id: "smile", name: "微笑", swatch: "#fff", icon: "😊", html: svg(`<ellipse cx="84" cy="86" rx="7" ry="9" fill="${LINE}"/><ellipse cx="116" cy="86" rx="7" ry="9" fill="${LINE}"/><circle cx="86" cy="84" r="2.2" fill="#fff"/><circle cx="118" cy="84" r="2.2" fill="#fff"/><path d="M90 104 C96 110 104 110 110 104" fill="none" stroke="${LINE}" stroke-width="3" stroke-linecap="round"/><ellipse cx="72" cy="96" rx="7" ry="4" fill="#ff9aa8" opacity="0.55"/><ellipse cx="128" cy="96" rx="7" ry="4" fill="#ff9aa8" opacity="0.55"/>`) },
@@ -171,6 +195,7 @@
     if (state.top === "dress") parts.bottom = "";
 
     el.character.replaceChildren();
+    // Face above hair so eyes stay visible; accessory on top for bows/crowns.
     ["body", "bottom", "top", "shoes", "hair", "face", "accessory"].forEach((key) => {
       if (!parts[key]) return;
       const layer = document.createElement("div");
