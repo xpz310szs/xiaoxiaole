@@ -18,11 +18,7 @@
   const ctx = el.canvas.getContext("2d");
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-  const TOOLS = {
-    brush: { name: "牙刷", power: 1, foam: 1.1 },
-    paste: { name: "牙膏", power: 1.55, foam: 1.6 },
-    floss: { name: "牙线", power: 2.1, foam: 0.55 },
-  };
+  const RESIDUE_RATIO = 0.24;
 
   let W = 0;
   let H = 0;
@@ -30,6 +26,7 @@
   let level = 1;
   let score = 0;
   let tool = "brush";
+  let pasteLoad = 0;
   let muted = false;
   let audioCtx = null;
   let teeth = [];
@@ -40,10 +37,45 @@
   let brushAngle = -0.55;
   let brushBob = 0;
   let lastScrubAt = 0;
+  let lastHintAt = 0;
   let toastTimer = 0;
   let mouthSmile = 0;
   let levelDone = false;
   let raf = 0;
+
+  function setTool(next) {
+    tool = next;
+    el.tools.forEach((b) => {
+      const id = b.dataset.tool;
+      b.classList.toggle("active", id === tool);
+    });
+    refreshPasteBadge();
+    updateHint();
+  }
+
+  function refreshPasteBadge() {
+    const brushBtn = el.tools.find((b) => b.dataset.tool === "brush");
+    if (!brushBtn) return;
+    brushBtn.classList.toggle("has-paste", pasteLoad > 0.05);
+    brushBtn.dataset.paste = pasteLoad > 0.05 ? "已挤牙膏" : "";
+  }
+
+  function updateHint() {
+    if (!playing) return;
+    if (tool === "floss") {
+      el.hint.textContent = "牙线只清牙缝残渣，大块先刷掉";
+    } else if (pasteLoad > 0.05) {
+      el.hint.textContent = "牙刷已有牙膏，按住拖动刷大块牙菌斑";
+    } else {
+      el.hint.textContent = "先点「牙膏」挤到牙刷上，再刷牙";
+    }
+  }
+
+  function softHint(text) {
+    if (performance.now() - lastHintAt < 900) return;
+    lastHintAt = performance.now();
+    showToast(text);
+  }
 
   function ensureAudio() {
     if (!audioCtx) {
@@ -231,49 +263,130 @@
     };
   }
 
-  function hitPlaque(x, y) {
-    const radius = tool === "floss" ? 14 : tool === "paste" ? 22 : 18;
+  function isResidue(p) {
+    return p.kind === "residue" || p.hp / p.max <= RESIDUE_RATIO + 0.001;
+  }
+
+  function hitPlaque(x, y, preferResidue) {
+    const radius = tool === "floss" ? 13 : 19;
+    let best = null;
+    let bestDist = Infinity;
     for (let i = plaques.length - 1; i >= 0; i -= 1) {
       const p = plaques[i];
       if (p.hp <= 0) continue;
+      if (preferResidue && !isResidue(p)) continue;
       const cx = p.x + p.w / 2;
       const cy = p.y + p.h / 2;
       const dx = x - cx;
       const dy = y - cy;
-      if (dx * dx + dy * dy <= (radius + Math.max(p.w, p.h) * 0.35) ** 2) {
-        return p;
+      const dist = dx * dx + dy * dy;
+      const reach = (radius + Math.max(p.w, p.h) * 0.35) ** 2;
+      if (dist <= reach && dist < bestDist) {
+        best = p;
+        bestDist = dist;
       }
     }
-    return null;
+    return best;
+  }
+
+  function toResidue(p) {
+    if (p.kind === "residue") return;
+    // Keep original max so brush progress is not undone when leftover becomes residue.
+    p.kind = "residue";
+    p.hp = Math.max(6, p.max * RESIDUE_RATIO);
+    p.fw *= 0.55;
+    p.fh *= 0.55;
+    p.fx += (1 - 0.55) * 0.2;
+    p.fy += (1 - 0.55) * 0.15;
+    syncPlaquesToTeeth();
+    softHint("残渣留给牙线清理～");
   }
 
   function scrubAt(x, y, dt) {
-    const p = hitPlaque(x, y);
-    const t = TOOLS[tool];
+    if (tool === "floss") {
+      scrubFloss(x, y, dt);
+      return;
+    }
+    scrubBrush(x, y, dt);
+  }
+
+  function scrubBrush(x, y, dt) {
+    const p = hitPlaque(x, y, false);
     if (!p) {
-      if (Math.random() < 0.08) spawnBubble(x, y, 0.5);
+      if (Math.random() < 0.06) spawnBubble(x, y, 0.35);
       return;
     }
 
-    const power = t.power * (16 + dt * 60);
+    if (isResidue(p)) {
+      softHint("残渣用牙线清，更干净");
+      if (Math.random() < 0.05) spawnBubble(x, y, 0.3);
+      return;
+    }
+
+    if (pasteLoad <= 0.02) {
+      softHint("先点「牙膏」挤到牙刷上");
+      // bare brush only weakly scuffs thick plaque
+      const weak = 3 + dt * 10;
+      p.hp = Math.max(p.max * (RESIDUE_RATIO + 0.15), p.hp - weak);
+      updateHud();
+      return;
+    }
+
+    const power = 22 + dt * 90;
     const before = p.hp;
-    p.hp = Math.max(0, p.hp - power);
+    const floor = p.max * RESIDUE_RATIO;
+    p.hp = Math.max(floor, p.hp - power);
+    pasteLoad = Math.max(0, pasteLoad - 0.012 - dt * 0.08);
+    refreshPasteBadge();
+    if (pasteLoad <= 0.02) updateHint();
+
     const removed = before - p.hp;
     if (removed <= 0) return;
 
-    score += Math.ceil(removed * (p.kind === "tartar" ? 1.4 : 1));
-    spawnBubble(x, y, t.foam);
+    score += Math.ceil(removed * (p.kind === "tartar" ? 1.3 : 1));
+    spawnBubble(x, y, 1.4);
     if (performance.now() - lastScrubAt > 70) {
       lastScrubAt = performance.now();
-      const base = p.kind === "tartar" ? 220 : 360;
-      tone(base + Math.random() * 120, 0.05, "triangle", 0.035);
+      tone(340 + Math.random() * 140, 0.05, "triangle", 0.035);
     }
 
-    if (p.hp <= 0) {
-      score += p.kind === "tartar" ? 40 : 20;
-      spawnSparks(p.x + p.w / 2, p.y + p.h / 2);
-      tone(620, 0.09, "sine", 0.05);
-      showToast(p.kind === "tartar" ? "牙结石清掉啦！" : "牙菌斑刷掉！");
+    if (p.hp <= floor + 0.5) {
+      const wasTartar = p.kind === "tartar";
+      toResidue(p);
+      score += wasTartar ? 18 : 12;
+      tone(520, 0.07, "sine", 0.045);
+    }
+
+    updateHud();
+    if (cleanProgress() >= 0.999) winLevel();
+  }
+
+  function scrubFloss(x, y, dt) {
+    const residue = hitPlaque(x, y, true);
+    if (!residue) {
+      const thick = hitPlaque(x, y, false);
+      if (thick) softHint("大块牙菌斑要先用牙膏牙刷刷");
+      return;
+    }
+
+    const power = 28 + dt * 110;
+    const before = residue.hp;
+    residue.hp = Math.max(0, residue.hp - power);
+    const removed = before - residue.hp;
+    if (removed <= 0) return;
+
+    score += Math.ceil(removed * 1.6);
+    spawnBubble(x, y, 0.45);
+    if (performance.now() - lastScrubAt > 80) {
+      lastScrubAt = performance.now();
+      tone(480 + Math.random() * 100, 0.04, "sine", 0.03);
+    }
+
+    if (residue.hp <= 0) {
+      score += 30;
+      spawnSparks(residue.x + residue.w / 2, residue.y + residue.h / 2);
+      tone(700, 0.09, "sine", 0.05);
+      showToast("残渣清干净啦！");
     }
 
     updateHud();
@@ -330,19 +443,27 @@
     }
     playing = true;
     levelDone = false;
+    pasteLoad = 0;
     bubbles = [];
     sparks = [];
     layoutTeeth();
     spawnPlaques();
+    setTool("brush");
     updateHud();
     el.overlay.classList.add("hidden");
-    el.hint.textContent =
-      tool === "floss"
-        ? "用牙线抠掉缝里的牙结石"
-        : tool === "paste"
-          ? "挤上牙膏大力刷"
-          : "按住拖动牙刷清理牙菌斑";
+    updateHint();
     tone(480, 0.07, "triangle", 0.05);
+  }
+
+  function squeezePaste() {
+    ensureAudio();
+    pasteLoad = 1;
+    setTool("brush");
+    refreshPasteBadge();
+    tone(660, 0.06, "sine", 0.05);
+    setTimeout(() => tone(740, 0.07, "triangle", 0.04), 70);
+    showToast("牙膏挤到牙刷上啦！");
+    updateHint();
   }
 
   function roundRect(x, y, w, h, r) {
@@ -427,20 +548,31 @@
     ctx.translate(p.x + p.w / 2, p.y + p.h / 2);
     ctx.rotate(p.rot);
     ctx.globalAlpha = alpha;
-    if (p.kind === "tartar") {
+    if (p.kind === "residue") {
+      const g = ctx.createRadialGradient(0, 0, 1, 0, 0, Math.max(p.w, p.h) * 0.55);
+      g.addColorStop(0, "#efe0b8");
+      g.addColorStop(1, "#c8a878");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, p.w * 0.42, p.h * 0.38, 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (p.kind === "tartar") {
       const g = ctx.createRadialGradient(0, 0, 2, 0, 0, Math.max(p.w, p.h) * 0.6);
       g.addColorStop(0, "#c9a06a");
       g.addColorStop(1, "#8a5a2e");
       ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, p.w * 0.55, p.h * 0.5, 0, 0, Math.PI * 2);
+      ctx.fill();
     } else {
       const g = ctx.createRadialGradient(0, 0, 2, 0, 0, Math.max(p.w, p.h) * 0.65);
       g.addColorStop(0, "#ffe56a");
       g.addColorStop(1, "#d4a83a");
       ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, p.w * 0.55, p.h * 0.5, 0, 0, Math.PI * 2);
+      ctx.fill();
     }
-    ctx.beginPath();
-    ctx.ellipse(0, 0, p.w * 0.55, p.h * 0.5, 0, 0, Math.PI * 2);
-    ctx.fill();
     ctx.restore();
   }
 
@@ -480,7 +612,7 @@
     ctx.rotate(brushAngle);
 
     // handle
-    ctx.fillStyle = tool === "paste" ? "#7ee0c8" : "#5ad6b8";
+    ctx.fillStyle = pasteLoad > 0.05 ? "#7ee0c8" : "#5ad6b8";
     roundRect(-8, 8, 16, 54, 8);
     ctx.fill();
     ctx.fillStyle = "#fff";
@@ -496,7 +628,7 @@
     ctx.stroke();
 
     // bristles
-    ctx.strokeStyle = tool === "paste" ? "#2eb89a" : "#7ec8ff";
+    ctx.strokeStyle = pasteLoad > 0.05 ? "#2eb89a" : "#7ec8ff";
     ctx.lineWidth = 2;
     for (let i = -10; i <= 10; i += 4) {
       ctx.beginPath();
@@ -505,10 +637,15 @@
       ctx.stroke();
     }
 
-    if (tool === "paste") {
-      ctx.fillStyle = "rgba(126, 224, 200, 0.7)";
+    if (pasteLoad > 0.05) {
+      const blob = 6 + pasteLoad * 7;
+      ctx.fillStyle = `rgba(126, 224, 200, ${0.45 + pasteLoad * 0.4})`;
       ctx.beginPath();
-      ctx.ellipse(0, -22, 11, 6, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, -22, blob, blob * 0.55, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,0.55)";
+      ctx.beginPath();
+      ctx.ellipse(-3, -24, blob * 0.28, blob * 0.18, -0.4, 0, Math.PI * 2);
       ctx.fill();
     }
 
@@ -600,17 +737,17 @@
   el.tools.forEach((btn) => {
     btn.addEventListener("click", () => {
       ensureAudio();
-      tool = btn.dataset.tool;
-      el.tools.forEach((b) => b.classList.toggle("active", b === btn));
-      tone(520, 0.05, "sine", 0.04);
-      if (playing) {
-        el.hint.textContent =
-          tool === "floss"
-            ? "用牙线抠掉缝里的牙结石"
-            : tool === "paste"
-              ? "挤上牙膏大力刷"
-              : "按住拖动牙刷清理牙菌斑";
+      const next = btn.dataset.tool;
+      if (next === "paste") {
+        if (!playing) {
+          softHint("先点开始刷牙");
+          return;
+        }
+        squeezePaste();
+        return;
       }
+      setTool(next);
+      tone(520, 0.05, "sine", 0.04);
     });
   });
 
