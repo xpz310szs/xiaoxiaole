@@ -411,11 +411,10 @@ body {
 }
 
 .preview.battle-mini .slash {
-  width: 18px;
-  height: 4px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #ffe56a, #ff7a2e);
-  transform: rotate(-28deg);
+  width: 16px;
+  height: 5px;
+  border-radius: 2px 6px 6px 2px;
+  background: linear-gradient(90deg, #3a4250 40%, #ffe56a 41%);
 }
 
 .preview.battle-mini .mob-dot {
