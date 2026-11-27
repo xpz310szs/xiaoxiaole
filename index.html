@@ -16,7 +16,7 @@
     <div class="cloud c2"></div>
   </div>
 
-  <main class="hub">
+  <main class="hub" id="hub">
     <header class="hero">
       <p class="eyebrow">STAR GAMES</p>
       <h1>星钻小游戏</h1>
@@ -24,7 +24,7 @@
     </header>
 
     <nav class="game-list" aria-label="游戏列表">
-      <a class="game-card match3" href="match3.html">
+      <button type="button" class="game-card match3" data-src="match3.html">
         <div class="preview" aria-hidden="true">
           <span class="gem g1"></span>
           <span class="gem g2"></span>
@@ -36,9 +36,9 @@
           <p>滑动三连消除 · 连击得分</p>
         </div>
         <span class="go">开始</span>
-      </a>
+      </button>
 
-      <a class="game-card tetris" href="tetris.html">
+      <button type="button" class="game-card tetris" data-src="tetris.html">
         <div class="preview blocks" aria-hidden="true">
           <span></span><span></span><span></span><span></span>
           <span></span><span></span><span></span><span></span>
@@ -48,9 +48,9 @@
           <p>经典下落方块 · 消行升级</p>
         </div>
         <span class="go">开始</span>
-      </a>
+      </button>
 
-      <a class="game-card zen" href="zen.html">
+      <button type="button" class="game-card zen" data-src="zen.html">
         <div class="preview bubbles" aria-hidden="true">
           <span></span><span></span><span></span><span></span>
           <span></span><span></span><span></span><span></span>
@@ -60,9 +60,9 @@
           <p>戳泡泡 · 捏捏球 · 开关墙</p>
         </div>
         <span class="go">开始</span>
-      </a>
+      </button>
 
-      <a class="game-card calm" href="calm.html">
+      <button type="button" class="game-card calm" data-src="calm.html">
         <div class="preview calm-orb" aria-hidden="true">
           <span class="orb"></span>
         </div>
@@ -71,9 +71,9 @@
           <p>呼吸 · 星空 · 涟漪放松</p>
         </div>
         <span class="go">开始</span>
-      </a>
+      </button>
 
-      <a class="game-card maze" href="maze.html">
+      <button type="button" class="game-card maze" data-src="maze.html">
         <div class="preview maze-mini" aria-hidden="true">
           <span></span><span></span><span></span>
           <span></span><span class="dot"></span><span></span>
@@ -84,9 +84,9 @@
           <p>滑动找路 · 难度可选</p>
         </div>
         <span class="go">开始</span>
-      </a>
+      </button>
 
-      <a class="game-card parkour" href="parkour.html">
+      <button type="button" class="game-card parkour" data-src="parkour.html">
         <div class="preview run-mini" aria-hidden="true">
           <span class="runner"></span>
           <span class="hurdle"></span>
@@ -96,9 +96,9 @@
           <p>二段跳 · 躲障碍 · 捡星星</p>
         </div>
         <span class="go">开始</span>
-      </a>
+      </button>
 
-      <a class="game-card cook" href="cook.html">
+      <button type="button" class="game-card cook" data-src="cook.html">
         <div class="preview cook-mini" aria-hidden="true">
           <span class="pan"></span>
           <span class="food"></span>
@@ -108,8 +108,14 @@
           <p>按顺序做菜 · 赶上上菜</p>
         </div>
         <span class="go">开始</span>
-      </a>
+      </button>
     </nav>
   </main>
+
+  <section id="player" class="player hidden" aria-label="游戏画面">
+    <iframe id="frame" title="游戏" allow="autoplay"></iframe>
+  </section>
+
+  <script src="hub.js"></script>
 </body>
 </html>
