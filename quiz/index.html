@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="google" content="notranslate" />
+  <title>星钻答题</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg" aria-hidden="true">
+    <span class="orb o1"></span>
+    <span class="orb o2"></span>
+    <span class="orb o3"></span>
+  </div>
+
+  <main class="stage">
+    <header class="top-bar">
+      <a class="back-link" href="../" target="_parent">← 大厅</a>
+      <div class="logo-block">
+        <p class="logo-en">STAR QUIZ</p>
+        <h1 class="logo">星钻答题</h1>
+      </div>
+      <button type="button" class="icon-btn" id="mute" aria-label="声音">♪</button>
+    </header>
+
+    <section class="hud" aria-label="状态">
+      <div class="badge">
+        <span class="badge-label">题号</span>
+        <span class="badge-value" id="progress">0/10</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">得分</span>
+        <span class="badge-value" id="score">0</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">连对</span>
+        <span class="badge-value" id="streak">0</span>
+      </div>
+    </section>
+
+    <section class="card" id="panel">
+      <p class="tag" id="tag">常识</p>
+      <h2 class="question" id="question">准备好了吗？</h2>
+      <div class="choices" id="choices" role="list"></div>
+      <p class="feedback" id="feedback" aria-live="polite"></p>
+    </section>
+
+    <div class="actions">
+      <button type="button" class="action solid" id="start">开始答题</button>
+      <button type="button" class="action ghost hidden" id="next">下一题</button>
+    </div>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
