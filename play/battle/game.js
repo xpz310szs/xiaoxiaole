@@ -43,13 +43,13 @@
     hp: MAX_HP,
     invuln: 0,
     attackCd: 0,
-    attacking: 0,
-    swing: 0,
+    muzzle: 0,
   };
 
   let wave = 1;
   let kills = 0;
   let monsters = [];
+  let bullets = [];
   let particles = [];
   let spawnLeft = 0;
   let spawnTimer = 0;
@@ -170,9 +170,10 @@
     hero.hp = MAX_HP;
     hero.invuln = 0;
     hero.attackCd = 0;
-    hero.attacking = 0;
+    hero.muzzle = 0;
     hero.jumps = 0;
     hero.onGround = true;
+    bullets = [];
     shake = 0;
     beginWave();
     updateHud();
@@ -202,12 +203,22 @@
   }
 
   function doAttack() {
-    if (hero.attackCd > 0 || hero.attacking > 0) return;
-    hero.attacking = 10;
-    hero.attackCd = 16;
-    hero.swing = hero.facing;
-    tone(280, 0.05, "sawtooth", 0.05);
-    tone(440, 0.06, "square", 0.04);
+    if (hero.attackCd > 0) return;
+    hero.attackCd = 14;
+    hero.muzzle = 6;
+    const muzzleX = hero.facing > 0 ? hero.x + hero.w + 2 : hero.x - 10;
+    const muzzleY = hero.y + 18;
+    bullets.push({
+      x: muzzleX,
+      y: muzzleY,
+      w: 10,
+      h: 4,
+      vx: hero.facing * 9.5,
+      life: 70,
+    });
+    spawnBurst(muzzleX + (hero.facing > 0 ? 4 : 0), muzzleY + 2, "#ffe56a", 4);
+    tone(180, 0.04, "sawtooth", 0.06);
+    tone(520, 0.05, "square", 0.04);
   }
 
   function hurtHero(amount = 1) {
@@ -260,18 +271,40 @@
     }
 
     if (hero.attackCd > 0) hero.attackCd -= step;
-    if (hero.attacking > 0) hero.attacking -= step;
+    if (hero.muzzle > 0) hero.muzzle -= step;
     if (hero.invuln > 0) hero.invuln -= step;
     if (shake > 0) shake -= step;
 
-    const sword = hero.attacking > 0
-      ? {
-          x: hero.facing > 0 ? hero.x + hero.w - 4 : hero.x - 30,
-          y: hero.y + 8,
-          w: 34,
-          h: 18,
+    for (let i = bullets.length - 1; i >= 0; i--) {
+      const b = bullets[i];
+      b.x += b.vx * step;
+      b.life -= step;
+      if (b.life <= 0 || b.x < -20 || b.x > W + 20) {
+        bullets.splice(i, 1);
+        continue;
+      }
+      let hit = false;
+      for (let j = monsters.length - 1; j >= 0; j--) {
+        const m = monsters[j];
+        if (!hitTest(b.x, b.y, b.w, b.h, m.x, m.y, m.w, m.h)) continue;
+        m.hp -= 1;
+        m.hurt = 12;
+        m.flash = 8;
+        m.x += Math.sign(b.vx) * 8;
+        spawnBurst(m.x + m.w / 2, m.y + m.h / 2, m.kind.color, 5);
+        tone(360 + Math.random() * 80, 0.06, "triangle", 0.06);
+        hit = true;
+        if (m.hp <= 0) {
+          spawnBurst(m.x + m.w / 2, m.y + m.h / 2, "#ffe56a", 12);
+          kills += m.kind.score;
+          monsters.splice(j, 1);
+          tone(720, 0.1, "sine", 0.07);
+          updateHud();
         }
-      : null;
+        break;
+      }
+      if (hit) bullets.splice(i, 1);
+    }
 
     if (spawnLeft > 0) {
       spawnTimer -= step;
@@ -309,23 +342,6 @@
         m.y = groundY - 70 + Math.sin(m.bob) * 16;
       } else {
         m.y = groundY - m.h;
-      }
-
-      if (sword && hitTest(sword.x, sword.y, sword.w, sword.h, m.x, m.y, m.w, m.h) && m.hurt <= 0) {
-        m.hp -= 1;
-        m.hurt = 12;
-        m.flash = 8;
-        m.x += hero.facing * 10;
-        spawnBurst(m.x + m.w / 2, m.y + m.h / 2, m.kind.color, 5);
-        tone(360 + Math.random() * 80, 0.06, "triangle", 0.06);
-        if (m.hp <= 0) {
-          spawnBurst(m.x + m.w / 2, m.y + m.h / 2, "#ffe56a", 12);
-          kills += m.kind.score;
-          monsters.splice(i, 1);
-          tone(720, 0.1, "sine", 0.07);
-          updateHud();
-          continue;
-        }
       }
 
       if (
@@ -396,31 +412,39 @@
     roundRect(x + 16, y + 30, 6, 7, 2);
     ctx.fill();
 
-    // sword swing
-    if (hero.attacking > 0) {
-      const t = 1 - hero.attacking / 10;
-      ctx.strokeStyle = "#ffe56a";
-      ctx.lineWidth = 4;
-      ctx.lineCap = "round";
-      ctx.beginPath();
-      const sx = x + hero.w - 2;
-      const sy = y + 18;
-      ctx.arc(sx, sy, 22, -0.9 + t * 1.4, -0.2 + t * 1.6);
-      ctx.stroke();
-      ctx.fillStyle = "#fff6b0";
-      ctx.beginPath();
-      ctx.arc(sx + Math.cos(-0.2 + t * 1.6) * 22, sy + Math.sin(-0.2 + t * 1.6) * 22, 4, 0, Math.PI * 2);
-      ctx.fill();
-    } else {
-      ctx.fillStyle = "#c0c8d8";
-      roundRect(x + hero.w - 6, y + 16, 5, 16, 2);
-      ctx.fill();
+    // gun
+    const gx = x + hero.w - 4;
+    const gy = y + 16;
+    ctx.fillStyle = "#3a4250";
+    roundRect(gx, gy, 18, 7, 2);
+    ctx.fill();
+    ctx.fillStyle = "#2a3038";
+    roundRect(gx + 14, gy + 1, 8, 5, 1);
+    ctx.fill();
+    ctx.fillStyle = "#5a6578";
+    roundRect(gx + 2, gy + 6, 5, 8, 1);
+    ctx.fill();
+    if (hero.muzzle > 0) {
       ctx.fillStyle = "#ffe56a";
-      roundRect(x + hero.w - 8, y + 12, 9, 6, 2);
+      ctx.beginPath();
+      ctx.ellipse(gx + 24, gy + 3.5, 7, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.arc(gx + 24, gy + 3.5, 2.5, 0, Math.PI * 2);
       ctx.fill();
     }
 
     ctx.restore();
+  }
+
+  function drawBullet(b) {
+    ctx.fillStyle = "#ffe56a";
+    roundRect(b.x, b.y, b.w, b.h, 2);
+    ctx.fill();
+    ctx.fillStyle = "#fff6b0";
+    roundRect(b.x + (b.vx > 0 ? b.w - 4 : 0), b.y + 1, 4, b.h - 2, 1);
+    ctx.fill();
   }
 
   function drawMonster(m) {
@@ -521,6 +545,7 @@
     });
 
     monsters.forEach(drawMonster);
+    bullets.forEach(drawBullet);
     drawHero();
 
     if (running && spawnLeft === 0 && monsters.length === 0 && waveClearTimer > 0) {
@@ -603,6 +628,6 @@
   window.addEventListener("resize", resize);
   resize();
   updateHud();
-  showOverlay("小人出击！", "左右移动 · 跳跃 · 攻击打败怪物", "开始战斗");
+  showOverlay("小人出击！", "左右移动 · 跳跃 · 开枪打败怪物", "开始战斗");
   raf = requestAnimationFrame(loop);
 })();
