@@ -9,5 +9,6 @@
 - [星钻迷宫](maze.html) — 随机迷宫找出口
 - [星钻跑酷](parkour.html) — 二段跳躲障碍
 - [星钻厨房](cook.html) — 按顺序做菜上菜
+- [星钻换装](dress.html) — 发型衣服配饰换装
 
 本地预览：在仓库根目录执行 `python3 -m http.server 8765 --bind 127.0.0.1`，打开 http://127.0.0.1:8765/
