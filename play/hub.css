@@ -184,6 +184,10 @@ body {
   background: linear-gradient(135deg, #fff0d8 0%, #ffe0a8 100%);
 }
 
+.game-card.clean {
+  background: linear-gradient(135deg, #efe6d8 0%, #e0d0b8 100%);
+}
+
 .preview {
   width: 78px;
   height: 78px;
@@ -460,6 +464,43 @@ body {
 .preview.quiz-mini .opt.b,
 .preview.quiz-mini .opt.c {
   background: rgba(42, 53, 80, 0.12);
+}
+
+.preview.clean-mini {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 5px;
+  padding: 10px;
+  place-items: center;
+}
+
+.preview.clean-mini .mess {
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+}
+
+.preview.clean-mini .m1 {
+  background: #ff9a4a;
+  transform: rotate(-12deg);
+}
+
+.preview.clean-mini .m2 {
+  background: #7ec8ff;
+  border-radius: 50%;
+}
+
+.preview.clean-mini .m3 {
+  background: #c8efc0;
+  transform: rotate(8deg);
+}
+
+.preview.clean-mini .bin-dot {
+  width: 18px;
+  height: 14px;
+  border-radius: 4px 4px 6px 6px;
+  background: #8a8f9a;
 }
 
 .meta h2 {

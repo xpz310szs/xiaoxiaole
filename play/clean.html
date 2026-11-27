@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="google" content="notranslate" />
+  <title>星钻清理</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="clean/styles.css" />
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <main class="stage">
+    <header class="top-bar">
+      <a class="back-link" href="./" target="_parent">← 大厅</a>
+      <div class="logo-block">
+        <p class="logo-en">STAR CLEAN</p>
+        <h1 class="logo">星钻清理</h1>
+      </div>
+      <button type="button" class="icon-btn" id="mute" aria-label="声音">♪</button>
+    </header>
+
+    <section class="hud" aria-label="状态">
+      <div class="badge">
+        <span class="badge-label">关卡</span>
+        <span class="badge-value" id="level">1</span>
+      </div>
+      <div class="badge wide">
+        <span class="badge-label">清理</span>
+        <div class="bar" aria-hidden="true"><i id="bar-fill"></i></div>
+        <span class="badge-value" id="left">0</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">得分</span>
+        <span class="badge-value" id="score">0</span>
+      </div>
+    </section>
+
+    <section class="desk-wrap">
+      <div class="desk" id="desk" aria-label="杂乱桌面">
+        <div class="desk-wood" aria-hidden="true"></div>
+        <p class="desk-hint" id="hint">拖动物品到下方分类区</p>
+      </div>
+      <div id="overlay" class="overlay">
+        <p class="overlay-title" id="overlay-title">桌面太乱了！</p>
+        <p class="overlay-sub" id="overlay-sub">把垃圾、文件、用品拖到对应区域</p>
+        <button type="button" class="overlay-btn" id="start">开始清理</button>
+      </div>
+    </section>
+
+    <section class="bins" aria-label="分类区">
+      <button type="button" class="bin trash" data-bin="trash" id="bin-trash">
+        <span class="bin-icon">🗑</span>
+        <span class="bin-name">垃圾桶</span>
+      </button>
+      <button type="button" class="bin files" data-bin="files" id="bin-files">
+        <span class="bin-icon">📁</span>
+        <span class="bin-name">文件架</span>
+      </button>
+      <button type="button" class="bin keep" data-bin="keep" id="bin-keep">
+        <span class="bin-icon">📦</span>
+        <span class="bin-name">收纳盒</span>
+      </button>
+    </section>
+  </main>
+
+  <script src="clean/game.js"></script>
+</body>
+</html>
