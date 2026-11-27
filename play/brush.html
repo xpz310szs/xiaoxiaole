@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="google" content="notranslate" />
+  <title>星钻刷牙</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="brush/styles.css" />
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <main class="stage">
+    <header class="top-bar">
+      <a class="back-link" href="./" target="_parent">← 大厅</a>
+      <div class="logo-block">
+        <p class="logo-en">STAR BRUSH</p>
+        <h1 class="logo">星钻刷牙</h1>
+      </div>
+      <button type="button" class="icon-btn" id="mute" aria-label="声音">♪</button>
+    </header>
+
+    <section class="hud" aria-label="状态">
+      <div class="badge">
+        <span class="badge-label">关卡</span>
+        <span class="badge-value" id="level">1</span>
+      </div>
+      <div class="badge wide">
+        <span class="badge-label">洁净</span>
+        <div class="bar" aria-hidden="true"><i id="bar-fill"></i></div>
+        <span class="badge-value" id="clean-pct">0%</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">得分</span>
+        <span class="badge-value" id="score">0</span>
+      </div>
+    </section>
+
+    <section class="mouth-wrap" aria-label="口腔">
+      <canvas id="mouth" aria-label="滑动牙刷清理牙齿"></canvas>
+      <div id="overlay" class="overlay">
+        <p class="overlay-title" id="overlay-title">牙齿需要清理！</p>
+        <p class="overlay-sub" id="overlay-sub">按住拖动牙刷，刷掉黄色牙菌斑和褐色牙结石</p>
+        <button type="button" class="overlay-btn" id="start">开始刷牙</button>
+      </div>
+    </section>
+
+    <section class="tools" aria-label="工具">
+      <button type="button" class="tool active" data-tool="brush" id="tool-brush">
+        <span class="tool-icon" aria-hidden="true">🪥</span>
+        <span>牙刷</span>
+      </button>
+      <button type="button" class="tool" data-tool="paste" id="tool-paste">
+        <span class="tool-icon" aria-hidden="true">🧴</span>
+        <span>牙膏</span>
+      </button>
+      <button type="button" class="tool" data-tool="floss" id="tool-floss">
+        <span class="tool-icon" aria-hidden="true">🧵</span>
+        <span>牙线</span>
+      </button>
+    </section>
+
+    <p class="hint" id="hint">选工具，按住拖动清理牙齿</p>
+  </main>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <script src="brush/game.js"></script>
+</body>
+</html>

@@ -188,6 +188,10 @@ body {
   background: linear-gradient(135deg, #efe6d8 0%, #e0d0b8 100%);
 }
 
+.game-card.brush {
+  background: linear-gradient(135deg, #e6fff8 0%, #b8f0e4 100%);
+}
+
 .preview {
   width: 78px;
   height: 78px;
@@ -501,6 +505,43 @@ body {
   height: 14px;
   border-radius: 4px 4px 6px 6px;
   background: #8a8f9a;
+}
+
+.preview.brush-mini {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 5px;
+  padding: 10px;
+  place-items: center;
+  position: relative;
+}
+
+.preview.brush-mini .tooth {
+  width: 16px;
+  height: 22px;
+  border-radius: 6px 6px 8px 8px;
+  background: linear-gradient(180deg, #fff, #e8fff8);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.preview.brush-mini .t2 {
+  background: linear-gradient(180deg, #fffaf0, #f0e0b8);
+}
+
+.preview.brush-mini .plaque {
+  width: 12px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe56a, #d4a83a);
+}
+
+.preview.brush-mini .brush-tip {
+  width: 18px;
+  height: 10px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #5ad6b8, #7ee0c8);
+  box-shadow: 0 4px 0 #2eb89a;
 }
 
 .meta h2 {
