@@ -4,6 +4,7 @@
     book: document.getElementById("book"),
     guide: document.getElementById("guide"),
     subjects: document.getElementById("subjects"),
+    palette: document.getElementById("palette"),
     made: document.getElementById("made"),
     mute: document.getElementById("mute"),
     clear: document.getElementById("clear"),
@@ -16,6 +17,19 @@
   const wctx = el.world.getContext("2d");
   const bctx = el.book.getContext("2d", { willReadFrequently: true });
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  const COLORS = [
+    "#2f2a28",
+    "#ff5a4a",
+    "#ff8a3d",
+    "#ffd23a",
+    "#5ad67a",
+    "#3db7ff",
+    "#ff6b9d",
+    "#a67c52",
+    "#7ec8ff",
+    "#ffffff",
+  ];
 
   const SUBJECTS = [
     { id: "flower", name: "小花", emoji: "🌸", color: "#ff6b9d" },
@@ -33,6 +47,7 @@
   let BW = 0;
   let BH = 0;
   let subject = SUBJECTS[0];
+  let penColor = subject.color;
   let drawing = false;
   let last = null;
   let ink = false;
@@ -123,7 +138,7 @@
     bctx.save();
     bctx.lineCap = "round";
     bctx.lineJoin = "round";
-    bctx.strokeStyle = subject.color;
+    bctx.strokeStyle = penColor;
     bctx.lineWidth = 7;
     bctx.beginPath();
     bctx.moveTo(a.x, a.y);
@@ -132,6 +147,37 @@
     bctx.restore();
     ink = true;
     el.guide.classList.add("hidden");
+  }
+
+  function setPenColor(c) {
+    penColor = c;
+    if (!el.palette) return;
+    [...el.palette.children].forEach((n) => {
+      n.classList.toggle("active", n.dataset.color === c);
+    });
+  }
+
+  function buildPalette() {
+    if (!el.palette) return;
+    el.palette.innerHTML = "";
+    COLORS.forEach((c, i) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "swatch" + (c === penColor ? " active" : "");
+      btn.dataset.color = c;
+      btn.style.background = c;
+      btn.setAttribute("aria-label", `颜色 ${i + 1}`);
+      if (c === "#ffffff") {
+        btn.style.boxShadow = "inset 0 0 0 1px rgba(0,0,0,0.14), 0 2px 0 rgba(80,40,10,0.18)";
+      }
+      btn.addEventListener("click", () => {
+        ensureAudio();
+        setPenColor(c);
+        tone(500, 0.04, "sine", 0.03);
+        showToast("笔的颜色换好了");
+      });
+      el.palette.appendChild(btn);
+    });
   }
 
   function buildSubjects() {
@@ -145,12 +191,13 @@
       btn.addEventListener("click", () => {
         ensureAudio();
         subject = s;
+        setPenColor(s.color);
         [...el.subjects.children].forEach((n) =>
           n.classList.toggle("active", n.dataset.id === s.id)
         );
         el.guide.textContent = s.emoji;
         if (!hasInk()) el.guide.classList.remove("hidden");
-        el.hint.textContent = `在画本上画一只${s.name}，再点「成真」`;
+        el.hint.textContent = `选颜色画一只${s.name}，再点「成真」`;
         tone(500, 0.04, "sine", 0.03);
       });
       el.subjects.appendChild(btn);
@@ -363,7 +410,7 @@
       scale: 0.9 + Math.random() * 0.35,
       phase: Math.random() * Math.PI * 2,
       tilt: (Math.random() - 0.5) * 0.2,
-      color: subject.color,
+      color: penColor || subject.color,
     });
     if (entities.length > 14) entities.shift();
   }
@@ -533,8 +580,10 @@
 
   window.addEventListener("resize", resizeAll);
 
+  buildPalette();
   buildSubjects();
+  setPenColor(penColor);
   resizeAll();
-  el.hint.textContent = `在画本上画一只${subject.name}，再点「成真」`;
+  el.hint.textContent = `选颜色画一只${subject.name}，再点「成真」`;
   requestAnimationFrame(frame);
 })();
