@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="google" content="notranslate" />
+  <title>星钻画本</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="book/styles.css" />
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <main class="stage">
+    <header class="top-bar">
+      <a class="back-link" href="./" target="_parent">← 大厅</a>
+      <div class="logo-block">
+        <p class="logo-en">STAR BOOK</p>
+        <h1 class="logo">星钻画本</h1>
+      </div>
+      <button type="button" class="icon-btn" id="mute" aria-label="声音">♪</button>
+    </header>
+
+    <section class="hud" aria-label="状态">
+      <div class="chip">成真 <strong id="made">0</strong></div>
+    </section>
+
+    <section class="world-wrap" aria-label="真实世界">
+      <p class="world-label">真实世界</p>
+      <canvas id="world" aria-label="画作变成真的会出现在这里"></canvas>
+    </section>
+
+    <div class="subjects" id="subjects" aria-label="想画什么"></div>
+
+    <section class="book-shell" aria-label="画本">
+      <p class="book-title">魔法画本 · 画出来就能成真</p>
+      <div class="book-page">
+        <div class="guide" id="guide" aria-hidden="true">🌸</div>
+        <canvas id="book" aria-label="在画本上画画"></canvas>
+      </div>
+      <div class="book-actions">
+        <button type="button" class="action ghost" id="undo">撤销</button>
+        <button type="button" class="action solid" id="make-real">成真！</button>
+        <button type="button" class="action ghost" id="clear">擦掉</button>
+      </div>
+    </section>
+
+    <p class="hint" id="hint">选一个角色，画在画本上，点成真</p>
+  </main>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <script src="book/game.js"></script>
+</body>
+</html>
