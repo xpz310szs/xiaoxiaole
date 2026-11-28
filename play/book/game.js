@@ -197,7 +197,7 @@
         );
         el.guide.textContent = s.emoji;
         if (!hasInk()) el.guide.classList.remove("hidden");
-        el.hint.textContent = `选颜色画一只${s.name}，再点「成真」`;
+        el.hint.textContent = `画一只${s.name}：画成什么样，上面就长什么样`;
         tone(500, 0.04, "sine", 0.03);
       });
       el.subjects.appendChild(btn);
@@ -205,136 +205,90 @@
     el.guide.textContent = subject.emoji;
   }
 
+  function cropDoodle() {
+    const w = el.book.width;
+    const h = el.book.height;
+    let data;
+    try {
+      data = bctx.getImageData(0, 0, w, h).data;
+    } catch (_) {
+      const fallback = document.createElement("canvas");
+      fallback.width = Math.max(1, Math.floor(BW));
+      fallback.height = Math.max(1, Math.floor(BH));
+      fallback.getContext("2d").drawImage(el.book, 0, 0, fallback.width, fallback.height);
+      return fallback;
+    }
+
+    let minX = w;
+    let minY = h;
+    let maxX = 0;
+    let maxY = 0;
+    let found = false;
+    for (let y = 0; y < h; y += 1) {
+      for (let x = 0; x < w; x += 1) {
+        const a = data[(y * w + x) * 4 + 3];
+        if (a > 18) {
+          found = true;
+          if (x < minX) minX = x;
+          if (y < minY) minY = y;
+          if (x > maxX) maxX = x;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+    if (!found) return null;
+
+    const pad = Math.round(10 * dpr);
+    minX = Math.max(0, minX - pad);
+    minY = Math.max(0, minY - pad);
+    maxX = Math.min(w - 1, maxX + pad);
+    maxY = Math.min(h - 1, maxY + pad);
+    const cw = Math.max(1, maxX - minX + 1);
+    const ch = Math.max(1, maxY - minY + 1);
+
+    const cropped = document.createElement("canvas");
+    cropped.width = cw;
+    cropped.height = ch;
+    cropped.getContext("2d").drawImage(el.book, minX, minY, cw, ch, 0, 0, cw, ch);
+    return cropped;
+  }
+
   function drawEntitySprite(ctx, ent, x, y, scale, bob) {
-    const s = 18 * scale;
+    if (!ent.doodle) return;
+    const dw = ent.doodle.width;
+    const dh = ent.doodle.height;
+    const maxSide = 56 * scale;
+    const ratio = Math.min(maxSide / dw, maxSide / dh);
+    const w = dw * ratio;
+    const h = dh * ratio;
+
     ctx.save();
     ctx.translate(x, y + bob);
-    ctx.rotate(ent.tilt || 0);
-
-    if (ent.kind === "flower") {
-      for (let i = 0; i < 5; i += 1) {
-        const a = (i / 5) * Math.PI * 2;
-        ctx.fillStyle = "#ff8fbf";
-        ctx.beginPath();
-        ctx.ellipse(Math.cos(a) * s * 0.45, Math.sin(a) * s * 0.45, s * 0.35, s * 0.22, a, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.fillStyle = "#ffe56a";
-      ctx.beginPath();
-      ctx.arc(0, 0, s * 0.28, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = "#5ad67a";
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(0, s * 0.2);
-      ctx.lineTo(0, s * 1.1);
-      ctx.stroke();
-    } else if (ent.kind === "bird") {
-      ctx.fillStyle = "#5ec8ff";
-      ctx.beginPath();
-      ctx.ellipse(0, 0, s * 0.7, s * 0.45, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#3db7ff";
-      ctx.beginPath();
-      ctx.ellipse(-s * 0.1, -s * 0.1, s * 0.45, s * 0.18, -0.4 + Math.sin(animT * 0.2 + ent.phase) * 0.3, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#ff9a4a";
-      ctx.beginPath();
-      ctx.moveTo(s * 0.65, 0);
-      ctx.lineTo(s * 0.95, -s * 0.1);
-      ctx.lineTo(s * 0.65, s * 0.12);
-      ctx.fill();
-      ctx.fillStyle = "#2f2a28";
-      ctx.beginPath();
-      ctx.arc(s * 0.35, -s * 0.1, s * 0.08, 0, Math.PI * 2);
-      ctx.fill();
+    // gentle life motion by subject type, but keep the drawing itself
+    if (ent.kind === "bird" || ent.kind === "butterfly") {
+      ctx.rotate(Math.sin(animT * 0.08 + ent.phase) * 0.08);
     } else if (ent.kind === "fish") {
-      ctx.fillStyle = "#5ad6c8";
-      ctx.beginPath();
-      ctx.ellipse(0, 0, s * 0.7, s * 0.4, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(-s * 0.55, 0);
-      ctx.lineTo(-s * 1.05, -s * 0.35);
-      ctx.lineTo(-s * 1.05, s * 0.35);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = "#2f2a28";
-      ctx.beginPath();
-      ctx.arc(s * 0.3, -s * 0.08, s * 0.08, 0, Math.PI * 2);
-      ctx.fill();
-    } else if (ent.kind === "balloon") {
-      ctx.fillStyle = ent.color || "#ff5a4a";
-      ctx.beginPath();
-      ctx.ellipse(0, -s * 0.15, s * 0.55, s * 0.7, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = "rgba(80,50,20,0.45)";
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(0, s * 0.55);
-      ctx.quadraticCurveTo(s * 0.15, s * 0.9, 0, s * 1.2);
-      ctx.stroke();
-    } else if (ent.kind === "star") {
-      ctx.fillStyle = "#ffe56a";
-      ctx.beginPath();
-      for (let i = 0; i < 10; i += 1) {
-        const a = -Math.PI / 2 + (i * Math.PI) / 5;
-        const r = i % 2 === 0 ? s : s * 0.42;
-        const px = Math.cos(a) * r;
-        const py = Math.sin(a) * r;
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }
-      ctx.closePath();
-      ctx.fill();
-    } else if (ent.kind === "cat") {
-      ctx.fillStyle = "#ffb070";
-      ctx.beginPath();
-      ctx.arc(0, 0, s * 0.55, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(-s * 0.45, -s * 0.2);
-      ctx.lineTo(-s * 0.55, -s * 0.85);
-      ctx.lineTo(-s * 0.1, -s * 0.45);
-      ctx.moveTo(s * 0.45, -s * 0.2);
-      ctx.lineTo(s * 0.55, -s * 0.85);
-      ctx.lineTo(s * 0.1, -s * 0.45);
-      ctx.fill();
-      ctx.fillStyle = "#2f2a28";
-      ctx.beginPath();
-      ctx.arc(-s * 0.18, -s * 0.05, s * 0.07, 0, Math.PI * 2);
-      ctx.arc(s * 0.18, -s * 0.05, s * 0.07, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = "#2f2a28";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(0, s * 0.12, s * 0.18, 0.1 * Math.PI, 0.9 * Math.PI);
-      ctx.stroke();
-    } else if (ent.kind === "tree") {
-      ctx.fillStyle = "#a67c52";
-      ctx.fillRect(-s * 0.12, s * 0.1, s * 0.24, s * 0.85);
-      ctx.fillStyle = "#5ad67a";
-      ctx.beginPath();
-      ctx.arc(0, -s * 0.15, s * 0.7, 0, Math.PI * 2);
-      ctx.arc(-s * 0.4, s * 0.15, s * 0.45, 0, Math.PI * 2);
-      ctx.arc(s * 0.4, s * 0.15, s * 0.45, 0, Math.PI * 2);
-      ctx.fill();
-    } else if (ent.kind === "butterfly") {
-      const flap = 0.55 + Math.sin(animT * 0.25 + ent.phase) * 0.25;
-      ctx.fillStyle = "#9ad4ff";
-      ctx.beginPath();
-      ctx.ellipse(-s * 0.35, 0, s * 0.45 * flap, s * 0.55, -0.3, 0, Math.PI * 2);
-      ctx.ellipse(s * 0.35, 0, s * 0.45 * flap, s * 0.55, 0.3, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#ffe56a";
-      ctx.fillRect(-s * 0.06, -s * 0.45, s * 0.12, s * 0.9);
+      ctx.rotate(Math.sin(animT * 0.06 + ent.phase) * 0.05);
+    } else {
+      ctx.rotate((ent.tilt || 0) * 0.5);
     }
 
-    // tiny user doodle badge
-    if (ent.doodle) {
-      ctx.globalAlpha = 0.9;
-      ctx.drawImage(ent.doodle, -s * 0.35, s * 0.85, s * 0.7, s * 0.55);
-    }
+    // soft ground shadow
+    ctx.fillStyle = "rgba(40, 60, 40, 0.16)";
+    ctx.beginPath();
+    ctx.ellipse(0, h * 0.48, w * 0.38, Math.max(4, h * 0.08), 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // the user's actual drawing — WYSIWYG
+    ctx.drawImage(ent.doodle, -w / 2, -h / 2, w, h);
+
+    // sparkle rim so it feels "alive"
+    ctx.globalAlpha = 0.55 + Math.sin(animT * 0.12 + ent.phase) * 0.25;
+    ctx.fillStyle = "#ffe56a";
+    ctx.beginPath();
+    ctx.arc(-w * 0.42, -h * 0.4, 2.2, 0, Math.PI * 2);
+    ctx.arc(w * 0.4, -h * 0.35, 1.8, 0, Math.PI * 2);
+    ctx.fill();
     ctx.restore();
   }
 
@@ -368,10 +322,11 @@
     });
 
     entities.forEach((ent) => {
-      const bob = Math.sin(animT * 0.05 + ent.phase) * (ent.kind === "balloon" || ent.kind === "bird" || ent.kind === "butterfly" ? 5 : 2);
-      if (ent.kind === "bird" || ent.kind === "butterfly" || ent.kind === "balloon") {
+      const floaty = ent.kind === "balloon" || ent.kind === "bird" || ent.kind === "butterfly" || ent.kind === "star";
+      const bob = Math.sin(animT * 0.05 + ent.phase) * (floaty ? 5 : 2);
+      if (ent.vx) {
         ent.x += ent.vx;
-        if (ent.x < 20 || ent.x > WW - 20) ent.vx *= -1;
+        if (ent.x < 28 || ent.x > WW - 28) ent.vx *= -1;
       }
       drawEntitySprite(wctx, ent, ent.x, ent.y, ent.scale, bob);
     });
@@ -380,18 +335,22 @@
       const p = f.t;
       const x = f.x0 + (f.x1 - f.x0) * p;
       const y = f.y0 + (f.y1 - f.y0) * p - Math.sin(p * Math.PI) * 50;
-      const sc = 0.55 + p * 0.55;
+      const dw = f.img.width;
+      const dh = f.img.height;
+      const maxSide = 36 + p * 28;
+      const ratio = Math.min(maxSide / dw, maxSide / dh);
+      const w = dw * ratio;
+      const h = dh * ratio;
       wctx.save();
-      wctx.globalAlpha = 1 - p * 0.15;
+      wctx.globalAlpha = 1 - p * 0.08;
       wctx.translate(x, y);
-      wctx.rotate(p * 0.4);
-      wctx.drawImage(f.img, -30 * sc, -24 * sc, 60 * sc, 48 * sc);
-      // sparkles
+      wctx.rotate(p * 0.25);
+      wctx.drawImage(f.img, -w / 2, -h / 2, w, h);
       wctx.fillStyle = "#ffe56a";
       for (let i = 0; i < 4; i += 1) {
         const a = animT * 0.2 + i;
         wctx.beginPath();
-        wctx.arc(Math.cos(a) * 28 * sc, Math.sin(a) * 22 * sc, 2.5, 0, Math.PI * 2);
+        wctx.arc(Math.cos(a) * (w * 0.55), Math.sin(a) * (h * 0.5), 2.5, 0, Math.PI * 2);
         wctx.fill();
       }
       wctx.restore();
@@ -401,18 +360,19 @@
   }
 
   function spawnEntity(kind, doodle, x, y) {
+    const floats = kind === "bird" || kind === "butterfly" || kind === "balloon" || kind === "star";
     entities.push({
       kind,
       doodle,
       x: x ?? 40 + Math.random() * (WW - 80),
       y: y ?? WH * (0.35 + Math.random() * 0.4),
-      vx: (Math.random() < 0.5 ? -1 : 1) * (0.35 + Math.random() * 0.45),
-      scale: 0.9 + Math.random() * 0.35,
+      vx: floats ? (Math.random() < 0.5 ? -1 : 1) * (0.25 + Math.random() * 0.4) : 0,
+      scale: 1.05 + Math.random() * 0.35,
       phase: Math.random() * Math.PI * 2,
-      tilt: (Math.random() - 0.5) * 0.2,
+      tilt: (Math.random() - 0.5) * 0.15,
       color: penColor || subject.color,
     });
-    if (entities.length > 14) entities.shift();
+    if (entities.length > 12) entities.shift();
   }
 
   function makeReal() {
@@ -423,24 +383,14 @@
       return;
     }
 
-    // snapshot doodle
-    const src = document.createElement("canvas");
-    src.width = el.book.width;
-    src.height = el.book.height;
-    src.getContext("2d").drawImage(el.book, 0, 0);
+    const doodle = cropDoodle();
+    if (!doodle) {
+      showToast(`先画一只${subject.name}吧`);
+      return;
+    }
 
-    const doodle = document.createElement("canvas");
-    doodle.width = 96;
-    doodle.height = 72;
-    const dctx = doodle.getContext("2d");
-    dctx.fillStyle = "#fff6e8";
-    dctx.fillRect(0, 0, 96, 72);
-    dctx.drawImage(src, 0, 0, 96, 72);
-
-    const bookRect = el.book.getBoundingClientRect();
-    const worldRect = el.world.getBoundingClientRect();
     const targetX = 40 + Math.random() * Math.max(40, WW - 80);
-    const targetY = WH * (0.35 + Math.random() * 0.35);
+    const targetY = WH * (0.32 + Math.random() * 0.38);
 
     flying.push({
       img: doodle,
@@ -465,12 +415,8 @@
     tone(523, 0.08, "sine", 0.05);
     setTimeout(() => tone(659, 0.1, "sine", 0.05), 80);
     setTimeout(() => tone(784, 0.12, "sine", 0.055), 160);
-    showToast(`${subject.name}变成真的啦！`);
-    el.hint.textContent = "再画一个，世界会更热闹";
-
-    // unused bookRect/worldRect silence
-    void bookRect;
-    void worldRect;
+    showToast(`你的${subject.name}飞上去啦！`);
+    el.hint.textContent = "画成什么样，上面就长什么样";
   }
 
   function undo() {
@@ -584,6 +530,6 @@
   buildSubjects();
   setPenColor(penColor);
   resizeAll();
-  el.hint.textContent = `选颜色画一只${subject.name}，再点「成真」`;
+  el.hint.textContent = `画一只${subject.name}：画成什么样，上面就长什么样`;
   requestAnimationFrame(frame);
 })();
