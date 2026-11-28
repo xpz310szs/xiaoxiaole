@@ -223,6 +223,36 @@ body {
   text-shadow: 0 1px 0 rgba(80, 40, 10, 0.35);
 }
 
+.palette {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 0.3rem;
+  overflow-x: auto;
+  padding: 0.05rem 0.1rem;
+  scrollbar-width: none;
+}
+
+.palette::-webkit-scrollbar {
+  display: none;
+}
+
+.swatch {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 0 rgba(80, 40, 10, 0.18);
+  cursor: pointer;
+  padding: 0;
+}
+
+.swatch.active {
+  outline: 2px solid #ffe56a;
+  outline-offset: 1px;
+  transform: scale(1.08);
+}
+
 .book-page {
   flex: 1 1 0;
   min-height: 0;
@@ -358,5 +388,10 @@ body {
 
   .book-title {
     display: none;
+  }
+
+  .swatch {
+    width: 24px;
+    height: 24px;
   }
 }
