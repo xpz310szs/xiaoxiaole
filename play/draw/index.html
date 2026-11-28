@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="google" content="notranslate" />
+  <title>星钻画画</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <main class="stage">
+    <header class="top-bar">
+      <a class="back-link" href="../" target="_parent">← 大厅</a>
+      <div class="logo-block">
+        <p class="logo-en">STAR DRAW</p>
+        <h1 class="logo">星钻画画</h1>
+      </div>
+      <button type="button" class="icon-btn" id="mute" aria-label="声音">♪</button>
+    </header>
+
+    <section class="hud" aria-label="状态">
+      <div class="chip">笔触 <strong id="strokes">0</strong></div>
+    </section>
+
+    <section class="board-wrap" aria-label="画布">
+      <canvas id="board" aria-label="在这里画画"></canvas>
+    </section>
+
+    <div class="palette" id="palette" aria-label="颜色"></div>
+
+    <section class="tools" aria-label="工具">
+      <button type="button" class="tool active" data-tool="pen">
+        <span class="tool-icon" aria-hidden="true">✏️</span>
+        <span>画笔</span>
+      </button>
+      <button type="button" class="tool" data-tool="eraser">
+        <span class="tool-icon" aria-hidden="true">🧽</span>
+        <span>橡皮</span>
+      </button>
+      <button type="button" class="tool" data-tool="stamp" id="tool-stamp">
+        <span class="tool-icon" id="stamp-icon" aria-hidden="true">⭐</span>
+        <span id="stamp-label">印章</span>
+      </button>
+      <button type="button" class="tool" data-tool="undo">
+        <span class="tool-icon" aria-hidden="true">↩</span>
+        <span>撤销</span>
+      </button>
+      <button type="button" class="tool" data-tool="clear">
+        <span class="tool-icon" aria-hidden="true">🗑</span>
+        <span>清空</span>
+      </button>
+    </section>
+
+    <section class="sizes" aria-label="粗细">
+      <button type="button" class="size-btn" data-size="4"><i style="width:6px;height:6px"></i>细</button>
+      <button type="button" class="size-btn active" data-size="10"><i style="width:10px;height:10px"></i>中</button>
+      <button type="button" class="size-btn" data-size="18"><i style="width:14px;height:14px"></i>粗</button>
+      <button type="button" class="size-btn" data-size="28"><i style="width:18px;height:18px"></i>特粗</button>
+    </section>
+
+    <p class="hint" id="hint">选颜色，按住拖动画画</p>
+  </main>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <script src="game.js"></script>
+</body>
+</html>
