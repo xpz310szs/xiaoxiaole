@@ -196,6 +196,10 @@ body {
   background: linear-gradient(135deg, #fff0e4 0%, #ffd2b0 100%);
 }
 
+.game-card.book {
+  background: linear-gradient(135deg, #e8f4ff 0%, #c8e4ff 100%);
+}
+
 .preview {
   width: 78px;
   height: 78px;
@@ -586,6 +590,46 @@ body {
   border-bottom: 14px solid #ff6b9d;
   background: none;
   filter: drop-shadow(0 6px 0 #ff6b9d);
+}
+
+.preview.book-mini {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 5px;
+  padding: 10px;
+  place-items: center;
+}
+
+.preview.book-mini .page {
+  width: 22px;
+  height: 18px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #fff6e8, #ffe8c8);
+  border: 1px solid #fff;
+  box-shadow: 2px 2px 0 #c48a55;
+}
+
+.preview.book-mini .doodle {
+  width: 14px;
+  height: 10px;
+  border-radius: 999px;
+  background: #ff6b9d;
+  transform: rotate(-20deg);
+}
+
+.preview.book-mini .spark {
+  width: 10px;
+  height: 10px;
+  background: #ffe56a;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.preview.book-mini .critter {
+  width: 16px;
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #7ec8ff, #3db7ff);
 }
 
 .meta h2 {
